@@ -1,0 +1,32 @@
+tmp_dir:
+  "/tmp"
+
+annotation_file:
+  "metadata/"
+
+genome:
+  "mm10"
+
+utrome_gtf:
+  "data/"
+
+utrome_kdx:
+  "data/"
+
+utrome_merge:
+  "data/"
+
+bx_whitelist:
+  ""
+
+sample_regex:
+  ".*"
+
+final_output_file:
+  "data/sce/output.utrome.txs.Rds"
+
+tech:
+  "10xv2"
+
+strand:
+  "--fr-stranded"
