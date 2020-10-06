@@ -1,0 +1,13 @@
+name: kallisto-build
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - autoconf
+  - automake
+  - hdf5
+  - make
+  - cmake
+  - cxx-compiler
+  - zlib

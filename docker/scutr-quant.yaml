@@ -1,0 +1,14 @@
+name: scutr-quant
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bustools=0.40.0
+  - r-base=4.0
+  - r-tidyverse=1.3
+  - r-cowplot=1.1
+  - bioconductor-singlecellexperiment=1.10
+#  - bioconductor-plyranges=1.8
+#  - bioconductor-scater=1.16
+#  - bioconductor-scran=1.16
