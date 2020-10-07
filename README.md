@@ -1,2 +1,97 @@
 # scutr-quant
 Bioinformatics pipeline for single-cell 3' UTR isoform quantification
+
+# Setup
+## Requirements
+The following must be installed to execute the pipeline:
+
+ - [Singularity](https://singularity.lbl.gov/index.html)
+ - [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html)
+
+This pipeline has only been tested on Linux. While it may be possible to run on
+other systems, note that Snakemake is not available for Windows, and Singularity
+only has native support for Linux.
+
+## Installation
+1. Clone the repository.
+    ```
+    git clone git@github.com:mfansler/scutr-quant.git
+    ```
+
+2. Download the UTRome annotation, kallisto index, and merge file.
+    ```
+    cd scutr-quant/extdata
+    . download_utrome.sh
+    ```
+    **Reuse Tip:** For use across multiple projects, it is recommended to centralize these files and change the entries in the `configfile` for `utrome_gtf`,
+    `utrome_kdx`, and `utrome_merge` to point to the central location. In that
+    case, one does not need to redownload the files.
+
+3. (Optional) Download the barcode whitelists.
+    ```
+    cd scutr-quant/extdata/bxs
+    . download_10X_whitelists.sh
+    ```
+    **Reuse Tip:** Similar to the UTRome files, these can also be centralized
+    and referenced by the `bx_whitelist` variable in the `configfile`.
+
+# Running Examples
+Examples are provided in the `scutr-quant/examples` folder. Each includes a script
+for downloading the raw data, a `sample_sheet.csv` formatted for use in the pipeline,
+and a `config.yaml` file for running the pipeline.
+
+Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
+
+## 1K Neurons (10xv3)
+
+1. Download the raw data.
+    ```
+    cd scutr-quant/examples/bam/
+    . download.sh
+    ```
+
+2. Run the pipeline.
+    ```
+    cd scutr-quant
+    snakemake --use-singularity --configfile examples/bam/config.yaml
+    ```
+
+# File Specifications
+## Configuration File
+
+The Snakemake `configfile` specifies the parameters used to run the
+pipeline. The following keys are expected:
+
+ - `tmp_dir`: path to use for temporary files
+ - `sample_file`: CSV-formatted file listing the samples to be processed
+ - `utrome_gtf`: GTF annotation of UTRome; used in annotating rows
+ - `utrome_kdx`: Kallisto index for UTRome
+ - `utrome_merge`: TSV for merging features (isoforms)
+ - `genome`: corresponds to genome that `utrome_gtf` references (only `mm10` currently supported)
+ - `sample_regex`: regular expression used to match sample IDs; including a specific
+     regex helps to constrain Snakemake's DAG-generation
+ - `final_output_file`: path and name of final file to be output; this will be a
+     `SingleCellExperiment` object that includes counts from all samples
+ - `tech`: argument to `kallisto bus` indicating the scRNA-seq technology; see
+     [the documentation](https://pachterlab.github.io/kallisto/manual#bus) for supported values
+ - `strand`: argument to `kallisto bus` indicating the orientation of sequence reads
+     with respect to transcripts; all 10X 3'-end libraries use `--fr-stranded`;
+     omitting this argument eliminates the ability to correctly assign reads to
+     transcripts when opposing stranded genes overlap
+ - `bx_whitelist`: file of valid barcodes used in `bustools correct`
+
+## Sample File
+
+The `sample_file` provided in the Snakemake configuration is expected to be a CSV
+with at least the following columns:
+
+ - `sample_id`: a unique identifier for the sample; used in file names and paths
+     of intermediate files derived from the sample
+ - `file_type`: indicates whether sample input is `'bam'` or `'fastq'` format
+ - `files`: a semicolon-separated list of files; for multi-run (e.g., multi-lane)
+     samples, the files must have the order:
+     ```
+     lane1_R1.fastq;lane1_R2.fastq;lane2_R1.fastq;lane2_R2.fastq;...
+     ```
+
+ 
