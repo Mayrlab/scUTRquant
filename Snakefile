@@ -1,4 +1,5 @@
 configfile: "config.yaml"
+container: "docker://mfansler/scutr-quant:0.1.0"
 
 import pandas as pd
 import os
@@ -8,11 +9,10 @@ from glob import glob
 os.makedirs(config['tmp_dir'], exist_ok=True)
 
 print("Loading sample data...")
-samples = pd.read_csv(config['sample_file'], sep='\t', index_col='sample_id')
+samples = pd.read_csv(config['sample_file'], index_col='sample_id')
 print("Loaded %d samples." % length(samples.index))
 
 wildcard_constraints:
-    srr="SRR\d+",
     sample_id=config['sample_regex']
 
 rule all:
@@ -26,7 +26,7 @@ def get_file_type(wildcards):
     return "--bam" if samples.file_type.values[wildcards.sample_id] == 'bam' else ""
 
 def get_sequence_files(wildcards):
-    return samples.files.values[wildcars.sample_id].split(';')
+    return samples.files.values[wildcards.sample_id].split(';')
 
 rule kallisto_bus:
     input:
@@ -120,8 +120,6 @@ rule bustools_count_genes:
         merge="data/utrs/utrome_gene_merge.tsv"
     output:
         "data/kallisto/{sample_id}/utrome.genes.mtx"
-    conda:
-        "envs/bustools.yaml"
     shell:
         """
         filename={output}
@@ -137,7 +135,6 @@ rule report_umis_per_cell:
         annots=config['annotation_file']
     output:
         "qc/umi_count/{sample_id}.umi_count.html"
-    conda: "envs/sce.yaml"
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
 
