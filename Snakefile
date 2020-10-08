@@ -1,5 +1,5 @@
-configfile: "config.yaml"
 container: "docker://mfansler/scutr-quant:0.1.0"
+configfile: "config.yaml"
 
 import pandas as pd
 import os
@@ -40,9 +40,9 @@ rule kallisto_bus:
         tech=config['tech'],
         strand=config['strand'],
         bam=get_file_type
-    threads: 16
-    resources:
-        mem=1
+#    threads: 16
+#    resources:
+#        mem=1
     shell:
         """
         outDir=$(dirname {output.bus})
@@ -69,12 +69,12 @@ rule bustools_sort:
         "data/kallisto/{sample_id}/output.corrected.sorted.bus"
     params:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
-    threads: 8
-    resources:
-        mem=2
+#    threads: 8
+#    resources:
+#        mem=2
     shell:
         """
-        bustools sort -t{threads} -m14G -T {params.tmpDir} -o {output} {input}
+        bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
         """
 
 rule generate_tx_merge:
@@ -153,8 +153,9 @@ rule mtxs_to_sce:
         sce=config['final_output_file']
     params:
         genome=config['genome'],
-        sample_ids=samples.index.values
-    resources:
-        mem=16
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis']
+#    resources:
+#        mem=16
     script:
         "scripts/mtxs_to_sce.R"

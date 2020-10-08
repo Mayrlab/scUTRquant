@@ -1,0 +1,66 @@
+---
+author: "scutr-quant"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r echo=FALSE}
+title_str <- sprintf("UMI Counts Distribution - %s", snakemake@wildcards$sample_id)
+```
+
+---
+title: `r title_str`
+---
+
+# Libraries
+```{r message=FALSE, warning=FALSE}
+library(Matrix)
+library(tidyverse)
+library(magrittr)
+library(cowplot)
+```
+
+# Load Data
+```{r}
+## df_annots <- read_csv(snakemake@input$annots, col_types='cc____________') %>%
+##   filter(sample == snakemake@params$group)
+
+cts <- readMM(snakemake@input$mtx) %>%
+  as("CsparseMatrix") %>%
+  `dimnames<-`(list(
+    cell_bx=read_lines(snakemake@input$bxs),
+    transcript_name=read_lines(snakemake@input$txs)
+  )) %>%
+  t %>%
+  { .[, colSums(.) > 0] } # filter zero cells
+```
+
+# Plot UMI Count Distribution
+
+Here we plot the empirical distribution of UMI counts per cell and include as reference the reported number of cells passing QC. Consistency with published data predicts that the distribution should exhibit a steep decline near the reported number.
+
+```{r}
+## n_published_cells <- nrow(df_annots)
+
+colSums(cts) %>%
+  sort(decreasing=TRUE) %>%
+  { tibble(x=seq_along(.), y=.) } %>%
+  ggplot(aes(x,y)) +
+  geom_line() +
+  geom_hline(yintercept=1000, color='blue', linetype='dashed') +
+##   geom_vline(xintercept=n_published_cells, linetype='dashed') +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x="Cell", y="UMI Count", title=snakemake@wildcards$sample_id) +
+  theme_cowplot()
+```
+
+---
+
+# Session Info
+```{r echo=FALSE}
+sessionInfo()
+```
