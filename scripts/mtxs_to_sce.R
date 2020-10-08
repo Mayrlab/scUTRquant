@@ -43,7 +43,7 @@ gr_utrs <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
 
     ## add rownames
     `names<-`(.$transcript_id)
-    
+
 ## Column Annotations
 ## df_annots <- read_csv(snakemake@input$annots)
 
@@ -57,7 +57,7 @@ load_mtx_to_sce <- function (mtxFile, bxFile, txFile, sample_id) {
             cell_id=str_c(read_lines(bxFile), "_", sample_id),
             transcript_id=read_lines(txFile))) %>%
         t %>%
-        { .[, colSums(.) >= snakemake@params$min_umis] } %>%
+        { .[, colSums(.) >= as.integer(snakemake@params$min_umis)] } %>%
         { SingleCellExperiment(assays=list(counts=.)) }
 }
 

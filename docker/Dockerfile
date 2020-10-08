@@ -2,11 +2,6 @@ FROM continuumio/miniconda3
 
 SHELL ["/bin/bash", "--login", "-c"]
 
-# Install required packages in base
-COPY scutr-quant.yaml .
-RUN conda env update -n base -f scutr-quant.yaml \
-  && conda clean -a -y
-
 # Install custom kallisto build
 COPY kallisto-build.yaml .
 RUN conda env create -f kallisto-build.yaml -n kallisto-build \
@@ -18,4 +13,9 @@ RUN conda env create -f kallisto-build.yaml -n kallisto-build \
   && cd $HOME && rm -rf /tmp/kallisto \
   && conda deactivate \
   && conda env remove -n kallisto-build -y \
+  && conda clean -a -y
+
+# Install required packages in base
+COPY scutr-quant.yaml .
+RUN conda env update -n base -f scutr-quant.yaml \
   && conda clean -a -y

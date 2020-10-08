@@ -1,4 +1,4 @@
-container: "docker://mfansler/scutr-quant:0.1.0"
+container: "docker://mfansler/scutr-quant:0.1.1"
 configfile: "config.yaml"
 
 import pandas as pd
