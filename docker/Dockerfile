@@ -19,3 +19,7 @@ RUN conda env create -f kallisto-build.yaml -n kallisto-build \
 COPY scutr-quant.yaml .
 RUN conda env update -n base -f scutr-quant.yaml \
   && conda clean -a -y
+
+# Patch for Cairo issue
+RUN apt-get update \
+  && apt-get install -y libxt-dev
