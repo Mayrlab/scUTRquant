@@ -10,7 +10,7 @@ os.makedirs(config['tmp_dir'], exist_ok=True)
 
 print("Loading sample data...")
 samples = pd.read_csv(config['sample_file'], index_col='sample_id')
-print("Loaded %d samples." % length(samples.index))
+print("Loaded %d samples." % len(samples.index))
 
 wildcard_constraints:
     sample_id=config['sample_regex']
@@ -23,10 +23,10 @@ rule all:
 
 
 def get_file_type(wildcards):
-    return "--bam" if samples.file_type.values[wildcards.sample_id] == 'bam' else ""
+    return "--bam" if samples.file_type[wildcards.sample_id] == 'bam' else ""
 
 def get_sequence_files(wildcards):
-    return samples.files.values[wildcards.sample_id].split(';')
+    return samples.files[wildcards.sample_id].split(';')
 
 rule kallisto_bus:
     input:
@@ -104,10 +104,12 @@ rule bustools_count_txs:
         ec="data/kallisto/{sample_id}/matrix.ec",
         merge="data/utrs/utrome_tx_merge.tsv"
     output:
-        "data/kallisto/{sample_id}/utrome.txs.mtx"
+        mtx="data/kallisto/{sample_id}/utrome.txs.mtx",
+        txs="data/kallisto/{sample_id}/utrome.txs.genes.txt",
+        bxs="data/kallisto/{sample_id}/utrome.txs.barcodes.txt"
     shell:
         """
-        filename={output}
+        filename={output.mtx}
         prefix=${{filename%.*}}
         bustools count -e {input.ec} -t {input.txs} -g {input.merge} -o $prefix --em --genecounts {input.bus}
         """
@@ -119,10 +121,12 @@ rule bustools_count_genes:
         ec="data/kallisto/{sample_id}/matrix.ec",
         merge="data/utrs/utrome_gene_merge.tsv"
     output:
-        "data/kallisto/{sample_id}/utrome.genes.mtx"
+        mtx="data/kallisto/{sample_id}/utrome.genes.mtx",
+        txs="data/kallisto/{sample_id}/utrome.genes.genes.txt",
+        bxs="data/kallisto/{sample_id}/utrome.genes.barcodes.txt"
     shell:
         """
-        filename={output}
+        filename={output.mtx}
         prefix=${{filename%.*}}
         bustools count -e {input.ec} -t {input.txs} -g {input.merge} -o $prefix --em --genecounts {input.bus}
         """
