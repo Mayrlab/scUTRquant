@@ -18,8 +18,8 @@ wildcard_constraints:
 rule all:
     input:
         config['final_output_file'],
-        # expand("qc/umi_count/{sample_id}.umi_count.html",
-        #        sample_id=samples.index.values)
+        expand("qc/umi_count/{sample_id}.umi_count.html",
+               sample_id=samples.index.values)
 
 
 def get_file_type(wildcards):
