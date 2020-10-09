@@ -40,9 +40,9 @@ rule kallisto_bus:
         tech=config['tech'],
         strand=config['strand'],
         bam=get_file_type
-#    threads: 16
-#    resources:
-#        mem=1
+    threads: 16
+    resources:
+        mem_mb=1024
     shell:
         """
         outDir=$(dirname {output.bus})
@@ -69,9 +69,9 @@ rule bustools_sort:
         "data/kallisto/{sample_id}/output.corrected.sorted.bus"
     params:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
-#    threads: 8
-#    resources:
-#        mem=2
+    threads: 4
+    resources:
+        mem_mb=2048
     shell:
         """
         bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
@@ -155,7 +155,7 @@ rule mtxs_to_sce:
         genome=config['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis']
-#    resources:
-#        mem=16
+    resources:
+        mem_mb=10000
     script:
         "scripts/mtxs_to_sce.R"
