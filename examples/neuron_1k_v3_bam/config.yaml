@@ -2,10 +2,10 @@ tmp_dir:
   "/tmp"
 
 sample_file:
-  "examples/bam/sample_sheet.csv"
+  "examples/neuron_1k_v3_bam/sample_sheet.csv"
 
 annotation_file:
-  "examples/bam/annots.csv"
+  "examples/neuron_1k_v3_bam/annots.csv"
 
 genome:
   "mm10"
@@ -26,7 +26,7 @@ sample_regex:
   ".*"
 
 final_output_file:
-  "data/sce/neuron_1k_v3.utrome.txs.Rds"
+  "data/sce/neuron_1k_v3_bam.utrome.txs.Rds"
 
 tech:
   "10xv3"
