@@ -42,7 +42,7 @@ rule kallisto_bus:
         bam=get_file_type
     threads: 16
     resources:
-        mem_mb=1024
+        mem_mb=1000
     shell:
         """
         outDir=$(dirname {output.bus})
@@ -71,7 +71,7 @@ rule bustools_sort:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
     threads: 4
     resources:
-        mem_mb=2048
+        mem_mb=2000
     shell:
         """
         bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
@@ -156,6 +156,6 @@ rule mtxs_to_sce:
         sample_ids=samples.index.values,
         min_umis=config['min_umis']
     resources:
-        mem_mb=10000
+        mem_mb=8000
     script:
         "scripts/mtxs_to_sce.R"
