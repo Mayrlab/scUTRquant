@@ -42,18 +42,32 @@ and a `config.yaml` file for running the pipeline.
 
 Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 
-## 1K Neurons (10xv3)
+## 1K Neurons (10xv3) - BAM
 
 1. Download the raw data.
     ```
-    cd scutr-quant/examples/bam/
+    cd scutr-quant/examples/neuron_1k_v3_bam/
     . download.sh
     ```
 
 2. Run the pipeline.
     ```
     cd scutr-quant
-    snakemake --use-singularity --configfile examples/bam/config.yaml
+    snakemake --use-singularity --configfile examples/neuron_1k_v3_bam/config.yaml
+    ```
+
+## 1K Neurons (10xv3) - FASTQ
+
+1. Download the raw data.
+    ```
+    cd scutr-quant/examples/neuron_1k_v3_fastq/
+    . download.sh
+    ```
+
+2. Run the pipeline.
+    ```
+    cd scutr-quant
+    snakemake --use-singularity --configfile examples/neuron_1k_v3_fastq/config.yaml
     ```
 
 # File Specifications
@@ -79,6 +93,17 @@ pipeline. The following keys are expected:
      omitting this argument eliminates the ability to correctly assign reads to
      transcripts when opposing stranded genes overlap
  - `bx_whitelist`: file of valid barcodes used in `bustools correct`
+ - `min_umis`: minimum number of UMIs per cell; cells below are discarded
+ 
+### Default Values
+
+Snakemake can draw values for `config` in three ways:
+
+ 1. `scutr-quant/config.yaml`: This file is listed as the `configfile` in the Snakefile. 
+ 2. `--configfile config.yaml`: The file provided at the commandline.
+ 3. `--config argument=value`: A specific value for an argument 
+ 
+This list runs from lowest to highest precedence. Configuration values that do not differ from those in `scutr-quant/config.yaml` can be left unspecfied in the YAML given by the `--configfile` argument. That is, one can use the `scutr-quant/config.yaml` to define shared settings, and only list dataset-specific config values in the dataset's YAML.
 
 ## Sample File
 
@@ -93,5 +118,7 @@ with at least the following columns:
      ```
      lane1_R1.fastq;lane1_R2.fastq;lane2_R1.fastq;lane2_R2.fastq;...
      ```
-
  
+# Customization
+
+The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with Snakemake profiles for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust
