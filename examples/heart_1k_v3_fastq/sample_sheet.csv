@@ -1,0 +1,2 @@
+sample_id,file_type,files
+heart_1k_v3_fastq,fastq,examples/heart_1k_v3_fastq/fastq/heart_1k_v3_S1_L001_R1_001.fastq.gz;examples/heart_1k_v3_fastq/fastq/heart_1k_v3_S1_L001_R2_001.fastq.gz;examples/heart_1k_v3_fastq/fastq/heart_1k_v3_S1_L002_R1_001.fastq.gz;examples/heart_1k_v3_fastq/fastq/heart_1k_v3_S1_L002_R2_001.fastq.gz

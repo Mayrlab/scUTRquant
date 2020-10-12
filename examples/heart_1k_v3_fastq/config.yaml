@@ -1,0 +1,17 @@
+sample_file:
+  "examples/heart_1k_v3_fastq/sample_sheet.csv"
+
+annotation_file:
+  "examples/heart_1k_v3_fastq/annots.csv"
+
+bx_whitelist:
+  "extdata/bxs/4M-with-alts-february-2016.txt"
+
+final_output_file:
+  "data/sce/heart_1k_v3_fastq.utrome.txs.Rds"
+
+tech:
+  "10xv3"
+
+strand:
+  "--fr-stranded"
