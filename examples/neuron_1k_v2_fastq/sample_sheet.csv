@@ -1,0 +1,2 @@
+sample_id,file_type,files
+neuron_1k_v2_fastq,fastq,examples/neuron_1k_v2_fastq/fastq/neuron_1k_v2_S1_L001_R1_001.fastq.gz;examples/neuron_1k_v2_fastq/fastq/neuron_1k_v2_S1_L001_R2_001.fastq.gz;examples/neuron_1k_v2_fastq/fastq/neuron_1k_v2_S1_L002_R1_001.fastq.gz;examples/neuron_1k_v2_fastq/fastq/neuron_1k_v2_S1_L002_R2_001.fastq.gz
