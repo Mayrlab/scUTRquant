@@ -12,18 +12,18 @@ if (interactive()) {
     Snakemake <- setClass("Snakemake", slots=c(input='list', output='list', params='list'))
     snakemake <- Snakemake(
         input=list(
-            bxs=c("data/kallisto/utrome/lsk_sigab1/utrome.txs.barcodes.txt",
-                  "data/kallisto/utrome/lk_sigaf1/utrome.txs.barcodes.txt"),
-            txs=c("data/kallisto/utrome/lsk_sigab1/utrome.txs.genes.txt",
-                  "data/kallisto/utrome/lk_sigaf1/utrome.txs.genes.txt"),
-            mtxs=c("data/kallisto/utrome/lsk_sigab1/utrome.txs.mtx",
-                   "data/kallisto/utrome/lk_sigaf1/utrome.txs.mtx"),
-            gtf="/data/mayrc/data/mca/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
+            bxs=c("data/kallisto/day5_DP_1/utrome.txs.barcodes.txt",
+                  "data/kallisto/day6_SP_1/utrome.txs.barcodes.txt"),
+            txs=c("data/kallisto/day5_DP_1/utrome.txs.genes.txt",
+                  "data/kallisto/day6_SP_1/utrome.txs.genes.txt"),
+            mtxs=c("data/kallisto/day5_DP_1/utrome.txs.mtx",
+                   "data/kallisto/day6_SP_1/utrome.txs.mtx"),
+            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
             annots="metadata/dahlin18_wolf19_annots.csv"),
-        output=list(sce="/fscratch/fanslerm/hspcs.utrome.txs.Rds"),
+        output=list(sce="data/sce/test.utrome.txs.Rds"),
         params=list(genome='mm10',
-                    sample_ids=c("SIGAB1", "SIGAF1"),
-                    min_umis="1000"))
+                    sample_ids=c("day5_DP_1", "day6_SP_1"),
+                    min_umis="500"))
 }
 
 ################################################################################
