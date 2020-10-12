@@ -113,9 +113,15 @@ rule generate_gene_merge:
         tail -n+2 {input} | cut -f1,3 > {output}
         """
 
+def get_input_busfile(wildcards):
+    if config['correct_bus']:
+        return "data/kallisto/%s/output.sorted.corrected.bus" % wildcards.sample_id
+    else:
+        return "data/kallisto/%s/output.sorted.bus" % wildcards.sample_id
+
 rule bustools_count_txs:
     input:
-        bus="data/kallisto/{sample_id}/output.sorted.corrected.bus",
+        bus=get_input_busfile,
         txs="data/kallisto/{sample_id}/transcripts.txt",
         ec="data/kallisto/{sample_id}/matrix.ec",
         merge="data/utrs/utrome_tx_merge.tsv"
@@ -132,7 +138,7 @@ rule bustools_count_txs:
 
 rule bustools_count_genes:
     input:
-        bus="data/kallisto/{sample_id}/output.sorted.corrected.bus",
+        bus=get_input_busfile,
         txs="data/kallisto/{sample_id}/transcripts.txt",
         ec="data/kallisto/{sample_id}/matrix.ec",
         merge="data/utrs/utrome_gene_merge.tsv"

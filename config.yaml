@@ -21,6 +21,9 @@ final_output_file:
 
 bx_whitelist:
   ""
-  
+
+correct_bus:
+  True
+
 min_umis:
-  1000
+  500
