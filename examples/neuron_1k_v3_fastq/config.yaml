@@ -5,7 +5,7 @@ annotation_file:
   "examples/neuron_1k_v3_fastq/annots.csv"
 
 bx_whitelist:
-  "extdata/bxs/4M-with-alts-february-2016.txt"
+  "extdata/bxs/3M-february-2018.txt"
 
 final_output_file:
   "data/sce/neuron_1k_v3_fastq.utrome.txs.Rds"
