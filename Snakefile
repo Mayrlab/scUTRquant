@@ -51,22 +51,11 @@ rule kallisto_bus:
         -x {params.tech} {params.strand} -o $outDir --verbose {input.files}
         """
 
-rule bustools_correct:
-    input:
-        bus="data/kallisto/{sample_id}/output.bus",
-        bxs=config['bx_whitelist']
-    output:
-        temp("data/kallisto/{sample_id}/output.corrected.bus")
-    shell:
-        """
-        bustools correct -w {input.bxs} -o {output} {input.bus}
-        """
-
 rule bustools_sort:
     input:
-        "data/kallisto/{sample_id}/output.corrected.bus"
+        "data/kallisto/{sample_id}/output.bus"
     output:
-        "data/kallisto/{sample_id}/output.corrected.sorted.bus"
+        temp("data/kallisto/{sample_id}/output.sorted.bus")
     params:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
     threads: 4
@@ -75,6 +64,33 @@ rule bustools_sort:
     shell:
         """
         bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
+        """
+
+rule bustools_whitelist:
+    input:
+        "data/kallisto/{sample_id}/output.sorted.bus"
+    output:
+        "data/kallisto/{sample_id}/whitelist.txt"
+    shell:
+        """
+        bustools whitelist -o {output} {input}
+        """
+
+def get_whitelist(wildcards):
+    if config['bx_whitelist'] == "":
+        return "data/kallisto/%s/whitelist.txt" % wildcards.sample_id
+    else:
+        return config['bx_whitelist']
+    
+rule bustools_correct:
+    input:
+        bus="data/kallisto/{sample_id}/output.sorted.bus",
+        bxs=get_whitelist
+    output:
+        temp("data/kallisto/{sample_id}/output.sorted.corrected.bus")
+    shell:
+        """
+        bustools correct -w {input.bxs} -o {output} {input.bus}
         """
 
 rule generate_tx_merge:
@@ -99,7 +115,7 @@ rule generate_gene_merge:
 
 rule bustools_count_txs:
     input:
-        bus="data/kallisto/{sample_id}/output.corrected.sorted.bus",
+        bus="data/kallisto/{sample_id}/output.sorted.corrected.bus",
         txs="data/kallisto/{sample_id}/transcripts.txt",
         ec="data/kallisto/{sample_id}/matrix.ec",
         merge="data/utrs/utrome_tx_merge.tsv"
@@ -116,7 +132,7 @@ rule bustools_count_txs:
 
 rule bustools_count_genes:
     input:
-        bus="data/kallisto/{sample_id}/output.corrected.sorted.bus",
+        bus="data/kallisto/{sample_id}/output.sorted.corrected.bus",
         txs="data/kallisto/{sample_id}/transcripts.txt",
         ec="data/kallisto/{sample_id}/matrix.ec",
         merge="data/utrs/utrome_gene_merge.tsv"

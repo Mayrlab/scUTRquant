@@ -1,29 +1,11 @@
-tmp_dir:
-  "/tmp"
-
 sample_file:
   "examples/neuron_1k_v3_fastq/sample_sheet.csv"
 
 annotation_file:
   "examples/neuron_1k_v3_fastq/annots.csv"
 
-genome:
-  "mm10"
-
-utrome_gtf:
-  "extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf"
-
-utrome_kdx:
-  "extdata/kallisto/adult.utrome.e3.t200.f0.999.w500.kdx"
-
-utrome_merge:
-  "extdata/gff/adult.utrome.e3.t200.f0.999.w500.merge.tsv"
-
 bx_whitelist:
   "extdata/bxs/4M-with-alts-february-2016.txt"
-
-sample_regex:
-  ".*"
 
 final_output_file:
   "data/sce/neuron_1k_v3_fastq.utrome.txs.Rds"
@@ -33,6 +15,3 @@ tech:
 
 strand:
   "--fr-stranded"
-
-min_umis:
-  1000

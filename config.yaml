@@ -1,12 +1,6 @@
 tmp_dir:
   "/tmp"
 
-sample_file:
-  ""
-
-annotation_file:
-  ""
-
 genome:
   "mm10"
 
@@ -19,17 +13,14 @@ utrome_kdx:
 utrome_merge:
   "extdata/gff/adult.utrome.e3.t200.f0.999.w500.merge.tsv"
 
-bx_whitelist:
-  ""
-
 sample_regex:
   ".*"
 
 final_output_file:
   "data/sce/output.utrome.txs.Rds"
 
-tech:
-  "10xv2"
-
-strand:
-  "--fr-stranded"
+bx_whitelist:
+  ""
+  
+min_umis:
+  1000
