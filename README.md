@@ -1,5 +1,53 @@
 # scutr-quant
-Bioinformatics pipeline for single-cell 3' UTR isoform quantification
+A bioinformatics pipeline for single-cell 3' UTR isoform quantification.
+
+# Overview
+The **scutr-quant** pipeline builds on `kallisto bus` to provide a reusable tool for 
+quantifying 3' UTR isoforms from 3'-end tag-based scRNA-seq datasets. The pipeline
+is based on Snakemake and reproducibily bundles all processing software in a single
+Docker image to abstract away software installations. It includes a prebuilt 
+reference UTRome for **mm10**, which ensures a consistent set of features (3' UTR isoforms)
+across different runs. In total, this provides a rapid pipeline for recovering
+3' UTR isoform counts from common scRNA-seq datasets.
+
+## Inputs
+The pipeline takes as input:
+
+- set of FASTQ or BAM (CellRanger output) files from scRNA-seq experiments
+- kallisto index of UTRome (**mm10** provided)
+- GTF annotation of UTRome (**mm10** provided)
+- TSV merge annotation (**mm10** provided)
+- YAML configuration file that controls pipeline parameters
+- CSV sample sheet detailing the FASTQ/BAM files to be processed
+- barcode whitelist (optional)
+- CSV of cell annotations (optional) [**Coming soon!**]
+
+**Note on UTRome Index**
+
+The pipeline includes code to download a prebuilt **mm10** UTRome GTF and kallisto index, 
+as well as the 10X barcode whitelists (versions 1-3). This prebuilt index was generated
+by augmenting the protein coding transcripts with identified 3' ends from the GENCODE 
+vM21 annotation with high-confidence cleavage sites called from the Mouse Cell Atlas 
+dataset. This augmented transcriptome was then truncated to include only the last 
+500 nts of each transcript and then deduplicated. Finally, the merge file contains
+information on transcripts whose cleavage sites differ by fewer than 200 nts, which 
+corresponds to the empirical resolution limit for `kallisto` quantification as 
+determined by simulations.
+
+## Outputs
+The primary output of the pipeline is a Bioconductor `SingleCellExperiment` object.
+The `counts` in the object is a sparse `Matrix` of 3' UTR isoform counts; the `rowData` 
+is a `GenomicRanges` of the 3' UTR isoforms features; and the `colData` is a `DataFrame`
+populated with sample metadata and optional user-provide cell annotations.
+
+To assist users in quality control, the pipeline additionally generates HTML reports 
+for each sample.
+
+The pipeline is configured to retain intermediate files, such as BUS and MTX files.
+Advanced users can readily customize the pipeline to only generate the files they 
+require. For example, users who prefer to work with alternative scRNA-seq data structures,
+such as those used in Scanpy or Seurat, may wish to terminate the pipeline at MTX 
+generation.
 
 # Setup
 ## Requirements
@@ -23,7 +71,8 @@ only has native support for Linux.
     cd scutr-quant/extdata
     . download_utrome.sh
     ```
-    **Reuse Tip:** For use across multiple projects, it is recommended to centralize these files and change the entries in the `configfile` for `utrome_gtf`,
+    **Reuse Tip:** For use across multiple projects, it is recommended to centralize 
+    these files and change the entries in the `configfile` for `utrome_gtf`,
     `utrome_kdx`, and `utrome_merge` to point to the central location. In that
     case, one does not need to redownload the files.
 
