@@ -26,7 +26,7 @@ The pipeline takes as input:
 
 The pipeline includes code to download a prebuilt **mm10** UTRome GTF and kallisto index, 
 as well as the 10X barcode whitelists (versions 1-3). This prebuilt index was generated
-by augmenting the protein coding transcripts with identified 3' ends from the GENCODE 
+by augmenting the protein coding transcripts that have verified 3' ends in the GENCODE 
 vM21 annotation with high-confidence cleavage sites called from the Mouse Cell Atlas 
 dataset. This augmented transcriptome was then truncated to include only the last 
 500 nts of each transcript and then deduplicated. Finally, the merge file contains
