@@ -18,12 +18,12 @@ if (interactive()) {
                   "data/kallisto/day6_SP_1/utrome.txs.genes.txt"),
             mtxs=c("data/kallisto/day5_DP_1/utrome.txs.mtx",
                    "data/kallisto/day6_SP_1/utrome.txs.mtx"),
-            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
-            annots="metadata/dahlin18_wolf19_annots.csv"),
+            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf"),
         output=list(sce="data/sce/test.utrome.txs.Rds"),
         params=list(genome='mm10',
                     sample_ids=c("day5_DP_1", "day6_SP_1"),
-                    min_umis="500"))
+                    min_umis="500",
+                    annots="metadata/dahlin18_wolf19_annots.csv"))
 }
 
 ################################################################################
@@ -45,7 +45,13 @@ gr_utrs <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
     `names<-`(.$transcript_id)
 
 ## Column Annotations
-## df_annots <- read_csv(snakemake@input$annots)
+df_annots <- snakemake@params$annots %>% {
+    if (file.exists(.)) {
+        read_csv(.) 
+    } else {
+        tibble(cell_id=character(0))
+    }
+}
 
 ## Load MTXs Function
 load_mtx_to_sce <- function (mtxFile, bxFile, txFile, sample_id) {
@@ -54,11 +60,12 @@ load_mtx_to_sce <- function (mtxFile, bxFile, txFile, sample_id) {
     readMM(mtxFile) %>%
         as("CsparseMatrix") %>%
         `dimnames<-`(list(
-            cell_id=str_c(read_lines(bxFile), "_", sample_id),
+            cell_id=str_c(sample_id, "_", read_lines(bxFile)),
             transcript_id=read_lines(txFile))) %>%
         t %>%
         { .[, colSums(.) >= as.integer(snakemake@params$min_umis)] } %>%
-        { SingleCellExperiment(assays=list(counts=.)) }
+        { SingleCellExperiment(assays=list(counts=.),
+                               colData=DataFrame(cell_id=colnames(.), sample_id=sample_id, row.names=colnames(.))) }
 }
 
 
@@ -73,10 +80,12 @@ sce <- mapply(load_mtx_to_sce,
                                         # Attach Annotations
 ################################################################################
 
-## colData(sce) <- df_annots %>%
-##     set_rownames(.$cell_id) %>%
-##     DataFrame %>%
-##     `[`(colnames(sce),)
+colData(sce) %<>%
+    as_tibble %>%
+    left_join(df_annots, by='cell_id') %>%
+    set_rownames(.$cell_id) %>%
+    DataFrame %>%
+    `[`(colnames(sce),)
 
 rowRanges(sce) <- gr_utrs[rownames(sce), ]
 

@@ -157,8 +157,9 @@ rule report_umis_per_cell:
     input:
         bxs="data/kallisto/{sample_id}/utrome.txs.barcodes.txt",
         txs="data/kallisto/{sample_id}/utrome.txs.genes.txt",
-        mtx="data/kallisto/{sample_id}/utrome.txs.mtx",
-        annots=config['annotation_file']
+        mtx="data/kallisto/{sample_id}/utrome.txs.mtx"
+    params:
+        min_umis=config['min_umis']
     output:
         "qc/umi_count/{sample_id}.umi_count.html"
     script:
@@ -169,14 +170,14 @@ rule mtxs_to_sce:
         bxs=expand("data/kallisto/{sample_id}/utrome.txs.barcodes.txt", sample_id=samples.index.values),
         txs=expand("data/kallisto/{sample_id}/utrome.txs.genes.txt", sample_id=samples.index.values),
         mtxs=expand("data/kallisto/{sample_id}/utrome.txs.mtx", sample_id=samples.index.values),
-        gtf=config['utrome_gtf'],
-        annots=config['annotation_file']
+        gtf=config['utrome_gtf']
     output:
         sce=config['final_output_file']
     params:
         genome=config['genome'],
         sample_ids=samples.index.values,
-        min_umis=config['min_umis']
+        min_umis=config['min_umis'],
+        annots=config['annotation_file']
     resources:
         mem_mb=8000
     script:

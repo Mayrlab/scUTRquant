@@ -22,6 +22,9 @@ final_output_file:
 bx_whitelist:
   ""
 
+annotation_file:
+  ""
+
 correct_bus:
   True
 

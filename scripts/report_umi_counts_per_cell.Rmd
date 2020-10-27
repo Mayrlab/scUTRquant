@@ -25,9 +25,6 @@ library(cowplot)
 
 # Load Data
 ```{r}
-## df_annots <- read_csv(snakemake@input$annots, col_types='cc____________') %>%
-##   filter(sample == snakemake@params$group)
-
 cts <- readMM(snakemake@input$mtx) %>%
   as("CsparseMatrix") %>%
   `dimnames<-`(list(
@@ -43,15 +40,13 @@ cts <- readMM(snakemake@input$mtx) %>%
 Here we plot the empirical distribution of UMI counts per cell and include as reference the reported number of cells passing QC. Consistency with published data predicts that the distribution should exhibit a steep decline near the reported number.
 
 ```{r}
-## n_published_cells <- nrow(df_annots)
-
 colSums(cts) %>%
   sort(decreasing=TRUE) %>%
   { tibble(x=seq_along(.), y=.) } %>%
   ggplot(aes(x,y)) +
   geom_line() +
-  geom_hline(yintercept=1000, color='blue', linetype='dashed') +
-##   geom_vline(xintercept=n_published_cells, linetype='dashed') +
+  geom_hline(yintercept=as.integer(snakemake@params$min_umis),
+	     color='blue', linetype='dashed') +
   scale_x_log10() +
   scale_y_log10() +
   labs(x="Cell", y="UMI Count", title=snakemake@wildcards$sample_id) +
