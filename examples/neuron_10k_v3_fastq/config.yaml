@@ -1,0 +1,17 @@
+sample_file:
+  "examples/neuron_10k_v3_fastq/sample_sheet.csv"
+
+annotation_file:
+  "examples/neuron_10k_v3_fastq/annots.csv"
+
+bx_whitelist:
+  "extdata/bxs/3M-february-2018.txt"
+
+final_output_file:
+  "data/sce/neuron_10k_v3_fastq.utrome.txs.Rds"
+
+tech:
+  "10xv3"
+
+strand:
+  "--fr-stranded"
