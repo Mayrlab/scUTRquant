@@ -33,7 +33,7 @@ rule kallisto_bus:
         idx=config['utrome_kdx'],
         files=get_sequence_files
     output:
-        bus="data/kallisto/{sample_id}/output.bus",
+        bus=temp("data/kallisto/{sample_id}/output.bus"),
         ec="data/kallisto/{sample_id}/matrix.ec",
         tx="data/kallisto/{sample_id}/transcripts.txt"
     params:
@@ -55,7 +55,7 @@ rule bustools_sort:
     input:
         "data/kallisto/{sample_id}/output.bus"
     output:
-        temp("data/kallisto/{sample_id}/output.sorted.bus")
+        "data/kallisto/{sample_id}/output.sorted.bus"
     params:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
     threads: 4
@@ -87,10 +87,25 @@ rule bustools_correct:
         bus="data/kallisto/{sample_id}/output.sorted.bus",
         bxs=get_whitelist
     output:
-        temp("data/kallisto/{sample_id}/output.sorted.corrected.bus")
+        temp("data/kallisto/{sample_id}/output.corrected.bus")
     shell:
         """
         bustools correct -w {input.bxs} -o {output} {input.bus}
+        """
+
+rule bustools_correct_sort:
+    input:
+        "data/kallisto/{sample_id}/output.corrected.bus"
+    output:
+        temp("data/kallisto/{sample_id}/output.corrected.sorted.bus")
+    params:
+        tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
+    threads: 4
+    resources:
+        mem_mb=2000
+    shell:
+        """
+        bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
         """
 
 rule generate_tx_merge:
@@ -115,7 +130,7 @@ rule generate_gene_merge:
 
 def get_input_busfile(wildcards):
     if config['correct_bus']:
-        return "data/kallisto/%s/output.sorted.corrected.bus" % wildcards.sample_id
+        return "data/kallisto/%s/output.corrected.sorted.bus" % wildcards.sample_id
     else:
         return "data/kallisto/%s/output.sorted.bus" % wildcards.sample_id
 
