@@ -197,3 +197,13 @@ rule mtxs_to_sce:
         mem_mb=8000
     script:
         "scripts/mtxs_to_sce.R"
+
+rule sce_txs_to_genes:
+    input:
+        sce="data/sce/{dataset}.txs.Rds"
+    output:
+        sce="data/sce/{dataset}.genes.Rds"
+    resources:
+        mem_mb=8000
+    script:
+        "scripts/sce_txs_to_genes.R"
