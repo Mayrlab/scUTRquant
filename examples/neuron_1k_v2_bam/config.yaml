@@ -1,14 +1,14 @@
 sample_file:
-  "examples/neuron_1k_v2_fastq/sample_sheet.csv"
+  "examples/neuron_1k_v2_bam/sample_sheet.csv"
 
 annotation_file:
-  "examples/neuron_1k_v2_fastq/annots.csv"
+  "examples/neuron_1k_v2_bam/annots.csv"
 
 bx_whitelist:
   "extdata/bxs/737K-august-2016.txt"
 
 final_output_file:
-  "data/sce/neuron_1k_v2_fastq.utrome.txs.Rds"
+  "data/sce/neuron_1k_v2_bam.utrome.txs.Rds"
 
 tech:
   "10xv2"
