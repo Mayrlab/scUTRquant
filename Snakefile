@@ -194,7 +194,7 @@ rule mtxs_to_sce:
         min_umis=config['min_umis'],
         annots=config['annotation_file']
     resources:
-        mem_mb=8000
+        mem_mb=16000
     script:
         "scripts/mtxs_to_sce.R"
 

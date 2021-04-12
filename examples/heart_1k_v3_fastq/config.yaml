@@ -15,3 +15,6 @@ tech:
 
 strand:
   "--fr-stranded"
+
+min_umis:
+  1000
