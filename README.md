@@ -20,7 +20,7 @@ The pipeline takes as input:
 - YAML configuration file that controls pipeline parameters
 - CSV sample sheet detailing the FASTQ/BAM files to be processed
 - barcode whitelist (optional)
-- CSV of cell annotations (optional) [**Coming soon!**]
+- CSV of cell annotations (optional)
 
 **Note on UTRome Index**
 
@@ -170,4 +170,4 @@ with at least the following columns:
  
 # Customization
 
-The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with Snakemake profiles for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust
+The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](https://github.com/Snakemake-Profiles) for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust to fit the resources available  on the deployment cluster.
