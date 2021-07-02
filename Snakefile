@@ -204,6 +204,6 @@ rule sce_txs_to_genes:
     output:
         sce="data/sce/{dataset}.genes.Rds"
     resources:
-        mem_mb=8000
+        mem_mb=16000
     script:
         "scripts/sce_txs_to_genes.R"
