@@ -1,8 +1,8 @@
-# scutr-quant
+# scUTRquant
 A bioinformatics pipeline for single-cell 3' UTR isoform quantification.
 
 # Overview
-The **scutr-quant** pipeline builds on `kallisto bus` to provide a reusable tool for 
+The **scUTRquant** pipeline builds on `kallisto bus` to provide a reusable tool for 
 quantifying 3' UTR isoforms from 3'-end tag-based scRNA-seq datasets. The pipeline
 is based on Snakemake and reproducibily bundles all processing software in a single
 Docker image to abstract away software installations. It includes a prebuilt 
@@ -62,12 +62,12 @@ only has native support for Linux.
 
 ## Installation
 1. Clone the repository.
-    ```
+    ```bash
     git clone git@github.com:mfansler/scutr-quant.git
     ```
 
 2. Download the UTRome annotation, kallisto index, and merge file.
-    ```
+    ```bash
     cd scutr-quant/extdata
     . download_utrome.sh
     ```
@@ -77,7 +77,7 @@ only has native support for Linux.
     case, one does not need to redownload the files.
 
 3. (Optional) Download the barcode whitelists.
-    ```
+    ```bash
     cd scutr-quant/extdata/bxs
     . download_10X_whitelists.sh
     ```
@@ -94,13 +94,13 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 ## 1K Neurons (10xv3) - BAM
 
 1. Download the raw data.
-    ```
+    ```bash
     cd scutr-quant/examples/neuron_1k_v3_bam/
     . download.sh
     ```
 
 2. Run the pipeline.
-    ```
+    ```bash
     cd scutr-quant
     snakemake --use-singularity --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
@@ -108,13 +108,13 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 ## 1K Neurons (10xv3) - FASTQ
 
 1. Download the raw data.
-    ```
+    ```bash
     cd scutr-quant/examples/neuron_1k_v3_fastq/
     . download.sh
     ```
 
 2. Run the pipeline.
-    ```
+    ```bash
     cd scutr-quant
     snakemake --use-singularity --configfile examples/neuron_1k_v3_fastq/config.yaml
     ```
@@ -170,4 +170,8 @@ with at least the following columns:
  
 # Customization
 
-The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](https://github.com/Snakemake-Profiles) for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust to fit the resources available  on the deployment cluster.
+The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](https://github.com/Snakemake-Profiles) for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust to fit the resources available  on the deployment cluster. We strongly recommend that cluster profiles include both `--use-singularity` and `--use-conda` flags by default. Following this recommendation, an example run, for instance on **neuron_1k_v3_fastq**, with profile name `profile_name`, would take the form:
+
+```bash
+snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config.yaml
+```
