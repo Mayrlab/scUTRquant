@@ -185,7 +185,8 @@ rule mtxs_to_sce:
         bxs=expand("data/kallisto/{sample_id}/utrome.txs.barcodes.txt", sample_id=samples.index.values),
         txs=expand("data/kallisto/{sample_id}/utrome.txs.genes.txt", sample_id=samples.index.values),
         mtxs=expand("data/kallisto/{sample_id}/utrome.txs.mtx", sample_id=samples.index.values),
-        gtf=config['utrome_gtf']
+        gtf=config['utrome_gtf'],
+        atlas=config['atlas_txs']
     output:
         sce=config['final_output_file']
     params:
@@ -200,7 +201,8 @@ rule mtxs_to_sce:
 
 rule sce_txs_to_genes:
     input:
-        sce="data/sce/{dataset}.txs.Rds"
+        sce="data/sce/{dataset}.txs.Rds",
+        atlas=config['atlas_genes']
     output:
         sce="data/sce/{dataset}.genes.Rds"
     resources:

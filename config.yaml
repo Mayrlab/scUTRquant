@@ -13,6 +13,12 @@ utrome_kdx:
 utrome_merge:
   "extdata/gff/adult.utrome.e3.t200.f0.999.w500.merge.tsv"
 
+atlas_txs:
+  "extdata/atlas/utrome_txs_annotation.Rds"
+
+atlas_genes:
+  "extdata/atlas/utrome_genes_annotation.Rds"
+
 sample_regex:
   ".*"
 

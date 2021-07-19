@@ -18,7 +18,8 @@ if (interactive()) {
                   "data/kallisto/day6_SP_1/utrome.txs.genes.txt"),
             mtxs=c("data/kallisto/day5_DP_1/utrome.txs.mtx",
                    "data/kallisto/day6_SP_1/utrome.txs.mtx"),
-            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf"),
+            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
+            atlas="extdata/atlas/utrome_txs_annotation.Rds"),
         output=list(sce="data/sce/test.utrome.txs.Rds"),
         params=list(genome='mm10',
                     sample_ids=c("day5_DP_1", "day6_SP_1"),
@@ -31,15 +32,15 @@ if (interactive()) {
 ################################################################################
 
 ## Row Annotations (UTRs)
+df_atlas <- readRDS(snakemake@input$atlas)
+
+## Row Ranges (
 gr_utrs <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
-                    col_names=c('type', 'transcript_id', 'transcript_name', 'gene_id')) %>%
+                    col_names=c('type', 'transcript_id')) %>%
 
     ## keep only transcripts
     filter(type == 'transcript') %>%
     select(-c('type')) %>%
-
-    ## add gene_symbol
-    mutate(gene_symbol=str_remove(transcript_id, "\\.[^.]+$")) %>%
 
     ## add rownames
     `names<-`(.$transcript_id)
@@ -88,6 +89,8 @@ colData(sce) %<>%
     `[`(colnames(sce),)
 
 rowRanges(sce) <- gr_utrs[rownames(sce), ]
+
+rowData(sce) <- df_atlas[rownames(sce), ]
 
 ################################################################################
                                         # Export SCE
