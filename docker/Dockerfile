@@ -1,21 +1,21 @@
-FROM continuumio/miniconda3
+FROM --platform=linux/amd64 condaforge/mambaforge:4.10.3-3
 
 SHELL ["/bin/bash", "--login", "-c"]
 
 # Install custom kallisto build
 COPY kallisto-build.yaml .
-RUN conda env create -f kallisto-build.yaml -n kallisto-build \
+RUN mamba env create -f kallisto-build.yaml -n kallisto-build \
   && git clone -b stranded --single-branch https://github.com/mfansler/kallisto.git /tmp/kallisto \
-  && conda activate kallisto-build \
-  && mkdir /tmp/kallisto/build && cd /tmp/kallisto/build \
+  && mkdir -p /tmp/kallisto/build && cd /tmp/kallisto/build \
+  && . /opt/conda/etc/profile.d/conda.sh \
   && conda activate kallisto-build \
   && cmake /tmp/kallisto && make && make install \
   && cd $HOME && rm -rf /tmp/kallisto \
   && conda deactivate \
-  && conda env remove -n kallisto-build -y \
-  && conda clean -a -y
+  && mamba env remove -n kallisto-build -y \
+  && mamba clean -qafy
 
 # Install required packages in base
 COPY scutr-quant.yaml .
-RUN conda env update -n base -f scutr-quant.yaml \
-  && conda clean -a -y
+RUN mamba env update -n base -f scutr-quant.yaml \
+  && mamba clean -qafy
