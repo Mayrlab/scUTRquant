@@ -18,4 +18,5 @@ RUN mamba env create -f kallisto-build.yaml -n kallisto-build \
 # Install required packages in base
 COPY scutr-quant.yaml .
 RUN mamba env update -n base -f scutr-quant.yaml \
+  && mamba env config vars set TZDIR=/opt/conda/share/zoneinfo \
   && mamba clean -qafy

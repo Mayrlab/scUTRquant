@@ -12,5 +12,6 @@ dependencies:
   - bioconductor-plyranges=1.8
   - xorg-libxt
   - fonts-conda-ecosystem
+  - tzdata
 #  - bioconductor-scater=1.16
 #  - bioconductor-scran=1.16
