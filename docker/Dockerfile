@@ -15,8 +15,12 @@ RUN mamba env create -f kallisto-build.yaml -n kallisto-build \
   && mamba env remove -n kallisto-build -y \
   && mamba clean -qafy
 
+# readr needs timezone info
+RUN apt-get update > /dev/null \
+  && DEBIAN_FRONTEND="noninteractive" apt-get install --no-install-recommends -y tzdata > /dev/null \
+  && apt-get clean
+
 # Install required packages in base
 COPY scutr-quant.yaml .
 RUN mamba env update -n base -f scutr-quant.yaml \
-  && mamba env config vars set TZDIR=/opt/conda/share/zoneinfo \
   && mamba clean -qafy
