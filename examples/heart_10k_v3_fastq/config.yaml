@@ -1,3 +1,6 @@
+dataset_name:
+  "heart_10k_v3_fastq"
+
 sample_file:
   "examples/heart_10k_v3_fastq/sample_sheet.csv"
 
@@ -7,11 +10,11 @@ annotation_file:
 bx_whitelist:
   "extdata/bxs/3M-february-2018.txt"
 
-final_output_file:
-  "data/sce/heart_10k_v3_fastq.utrome.txs.Rds"
-
 tech:
   "10xv3"
 
 strand:
   "--fr-stranded"
+
+min_umis:
+  1000

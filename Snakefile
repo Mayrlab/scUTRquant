@@ -3,7 +3,6 @@ configfile: "config.yaml"
 
 import pandas as pd
 import os
-from glob import glob
 
 # make sure the tmp directory exists
 os.makedirs(config['tmp_dir'], exist_ok=True)
@@ -15,12 +14,14 @@ print("Loaded %d samples." % len(samples.index))
 wildcard_constraints:
     sample_id=config['sample_regex']
 
+    
 rule all:
     input:
-        config['final_output_file'],
+        expand("data/sce/{dataset}.utrome.{output_type}.Rds",
+               dataset=config['dataset_name'],
+               output_type=config['output_type']),
         expand("qc/umi_count/{sample_id}.umi_count.html",
                sample_id=samples.index.values)
-
 
 def get_file_type(wildcards):
     return "--bam" if samples.file_type[wildcards.sample_id] == 'bam' else ""
@@ -188,7 +189,7 @@ rule mtxs_to_sce_txs:
         gtf=config['utrome_gtf'],
         atlas=config['atlas_txs']
     output:
-        sce=config['final_output_file']
+        sce="data/sce/%s.utrome.txs.Rds" % config['dataset_name']
     params:
         genome=config['genome'],
         sample_ids=samples.index.values,
@@ -197,18 +198,7 @@ rule mtxs_to_sce_txs:
     resources:
         mem_mb=16000
     script:
-        "scripts/mtxs_to_sce.R"
-
-# rule sce_txs_to_genes:
-#     input:
-#         sce="data/sce/{dataset}.txs.Rds",
-#         atlas=config['atlas_genes']
-#     output:
-#         sce="data/sce/{dataset}.genes.Rds"
-#     resources:
-#         mem_mb=16000
-#     script:
-#         "scripts/sce_txs_to_genes.R"
+        "scripts/mtxs_to_sce_txs.R"
 
 rule mtxs_to_sce_genes:
     input:
@@ -218,7 +208,7 @@ rule mtxs_to_sce_genes:
         gtf=config['utrome_gtf'],
         atlas=config['atlas_genes']
     output:
-        sce="data/sce/{dataset}.genes.Rds"
+        sce="data/sce/%s.utrome.genes.Rds" % config['dataset_name']
     params:
         genome=config['genome'],
         sample_ids=samples.index.values,
