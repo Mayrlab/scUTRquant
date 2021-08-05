@@ -20,7 +20,7 @@ The pipeline takes as input:
 - YAML configuration file that controls pipeline parameters
 - CSV sample sheet detailing the FASTQ/BAM files to be processed
 - barcode whitelist (optional)
-- CSV of cell annotations (optional) [**Coming soon!**]
+- CSV of cell annotations (optional)
 
 **Note on UTRome Index**
 
@@ -36,9 +36,10 @@ determined by simulations.
 
 ## Outputs
 The primary output of the pipeline is a Bioconductor `SingleCellExperiment` object.
-The `counts` in the object is a sparse `Matrix` of 3' UTR isoform counts; the `rowData` 
-is a `GenomicRanges` of the 3' UTR isoforms features; and the `colData` is a `DataFrame`
-populated with sample metadata and optional user-provide cell annotations.
+The `counts` in the object is a sparse `Matrix` of 3' UTR isoform counts; the `rowRanges` 
+is a `GenomicRanges` of the 3' UTR isoforms; the `rowData` is a `DataFrame` with additional
+information about 3' UTR isoforms; and the `colData` is a `DataFrame` populated with sample 
+metadata and optional user-provide cell annotations.
 
 To assist users in quality control, the pipeline additionally generates HTML reports 
 for each sample.
@@ -125,6 +126,7 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 The Snakemake `configfile` specifies the parameters used to run the
 pipeline. The following keys are expected:
 
+ - `dataset_name`: name used in the final `SingleCellExperiment` object
  - `tmp_dir`: path to use for temporary files
  - `sample_file`: CSV-formatted file listing the samples to be processed
  - `utrome_gtf`: GTF annotation of UTRome; used in annotating rows
@@ -133,8 +135,7 @@ pipeline. The following keys are expected:
  - `genome`: corresponds to genome that `utrome_gtf` references (only `mm10` currently supported)
  - `sample_regex`: regular expression used to match sample IDs; including a specific
      regex helps to constrain Snakemake's DAG-generation
- - `final_output_file`: path and name of final file to be output; this will be a
-     `SingleCellExperiment` object that includes counts from all samples
+ - `output_type`: a list of outputs, including `"txs"` and/or `"genes"`
  - `tech`: argument to `kallisto bus` indicating the scRNA-seq technology; see
      [the documentation](https://pachterlab.github.io/kallisto/manual#bus) for supported values
  - `strand`: argument to `kallisto bus` indicating the orientation of sequence reads
@@ -142,7 +143,7 @@ pipeline. The following keys are expected:
      omitting this argument eliminates the ability to correctly assign reads to
      transcripts when opposing stranded genes overlap
  - `bx_whitelist`: file of valid barcodes used in `bustools correct`
- - `min_umis`: minimum number of UMIs per cell; cells below are discarded
+ - `min_umis`: minimum number of UMIs per cell; cells below this threshold are excluded
  
 ### Default Values
 
@@ -170,4 +171,4 @@ with at least the following columns:
  
 # Customization
 
-The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with Snakemake profiles for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust
+The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](snakemake profiles slurm) for cluster deployment (strongly encouraged to use). The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust as needed.
