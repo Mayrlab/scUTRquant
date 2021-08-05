@@ -125,6 +125,7 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 The Snakemake `configfile` specifies the parameters used to run the
 pipeline. The following keys are expected:
 
+ - `dataset_name`: name used in the final `SingleCellExperiment` object
  - `tmp_dir`: path to use for temporary files
  - `sample_file`: CSV-formatted file listing the samples to be processed
  - `utrome_gtf`: GTF annotation of UTRome; used in annotating rows
@@ -133,8 +134,7 @@ pipeline. The following keys are expected:
  - `genome`: corresponds to genome that `utrome_gtf` references (only `mm10` currently supported)
  - `sample_regex`: regular expression used to match sample IDs; including a specific
      regex helps to constrain Snakemake's DAG-generation
- - `final_output_file`: path and name of final file to be output; this will be a
-     `SingleCellExperiment` object that includes counts from all samples
+ - `output_type`: a list of outputs, including `"txs"` and/or `"genes"`
  - `tech`: argument to `kallisto bus` indicating the scRNA-seq technology; see
      [the documentation](https://pachterlab.github.io/kallisto/manual#bus) for supported values
  - `strand`: argument to `kallisto bus` indicating the orientation of sequence reads
@@ -142,7 +142,7 @@ pipeline. The following keys are expected:
      omitting this argument eliminates the ability to correctly assign reads to
      transcripts when opposing stranded genes overlap
  - `bx_whitelist`: file of valid barcodes used in `bustools correct`
- - `min_umis`: minimum number of UMIs per cell; cells below are discarded
+ - `min_umis`: minimum number of UMIs per cell; cells below this threshold are excluded
  
 ### Default Values
 
