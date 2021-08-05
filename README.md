@@ -1,8 +1,8 @@
-# scutr-quant
+# scUTRquant
 A bioinformatics pipeline for single-cell 3' UTR isoform quantification.
 
 # Overview
-The **scutr-quant** pipeline builds on `kallisto bus` to provide a reusable tool for 
+The **scUTRquant** pipeline builds on `kallisto bus` to provide a reusable tool for 
 quantifying 3' UTR isoforms from 3'-end tag-based scRNA-seq datasets. The pipeline
 is based on Snakemake and reproducibily bundles all processing software in a single
 Docker image to abstract away software installations. It includes a prebuilt 
@@ -171,4 +171,8 @@ with at least the following columns:
  
 # Customization
 
-The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](snakemake profiles slurm) for cluster deployment (strongly encouraged to use). The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust as needed.
+The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](https://github.com/Snakemake-Profiles) for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust to fit the resources available on the deployment cluster. We strongly recommend that cluster profiles include both `--use-singularity` and `--use-conda` flags by default. Following this recommendation, an example run, for instance on **neuron_1k_v3_fastq**, with profile name `profile_name`, would take the form:
+
+```bash
+snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config.yaml
+```
