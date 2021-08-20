@@ -1,3 +1,6 @@
+dataset_name:
+  "neuron_1k_v2_fastq"
+
 sample_file:
   "examples/neuron_1k_v2_fastq/sample_sheet.csv"
 
@@ -6,9 +9,6 @@ annotation_file:
 
 bx_whitelist:
   "extdata/bxs/737K-august-2016.txt"
-
-final_output_file:
-  "data/sce/neuron_1k_v2_fastq.utrome.txs.Rds"
 
 tech:
   "10xv2"

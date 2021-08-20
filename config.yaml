@@ -22,8 +22,12 @@ atlas_genes:
 sample_regex:
   ".*"
 
-final_output_file:
-  "data/sce/output.utrome.txs.Rds"
+dataset_name:
+  "output"
+
+output_type:
+  - "txs"
+  - "genes"
 
 bx_whitelist:
   ""

@@ -3,7 +3,6 @@ configfile: "config.yaml"
 
 import pandas as pd
 import os
-from glob import glob
 
 # make sure the tmp directory exists
 os.makedirs(config['tmp_dir'], exist_ok=True)
@@ -15,12 +14,14 @@ print("Loaded %d samples." % len(samples.index))
 wildcard_constraints:
     sample_id=config['sample_regex']
 
+    
 rule all:
     input:
-        config['final_output_file'],
+        expand("data/sce/{dataset}.utrome.{output_type}.Rds",
+               dataset=config['dataset_name'],
+               output_type=config['output_type']),
         expand("qc/umi_count/{sample_id}.umi_count.html",
                sample_id=samples.index.values)
-
 
 def get_file_type(wildcards):
     return "--bam" if samples.file_type[wildcards.sample_id] == 'bam' else ""
@@ -180,7 +181,7 @@ rule report_umis_per_cell:
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
 
-rule mtxs_to_sce:
+rule mtxs_to_sce_txs:
     input:
         bxs=expand("data/kallisto/{sample_id}/utrome.txs.barcodes.txt", sample_id=samples.index.values),
         txs=expand("data/kallisto/{sample_id}/utrome.txs.genes.txt", sample_id=samples.index.values),
@@ -188,7 +189,7 @@ rule mtxs_to_sce:
         gtf=config['utrome_gtf'],
         atlas=config['atlas_txs']
     output:
-        sce=config['final_output_file']
+        sce="data/sce/%s.utrome.txs.Rds" % config['dataset_name']
     params:
         genome=config['genome'],
         sample_ids=samples.index.values,
@@ -197,15 +198,23 @@ rule mtxs_to_sce:
     resources:
         mem_mb=16000
     script:
-        "scripts/mtxs_to_sce.R"
+        "scripts/mtxs_to_sce_txs.R"
 
-rule sce_txs_to_genes:
+rule mtxs_to_sce_genes:
     input:
-        sce="data/sce/{dataset}.txs.Rds",
+        bxs=expand("data/kallisto/{sample_id}/utrome.genes.barcodes.txt", sample_id=samples.index.values),
+        genes=expand("data/kallisto/{sample_id}/utrome.genes.genes.txt", sample_id=samples.index.values),
+        mtxs=expand("data/kallisto/{sample_id}/utrome.genes.mtx", sample_id=samples.index.values),
+        gtf=config['utrome_gtf'],
         atlas=config['atlas_genes']
     output:
-        sce="data/sce/{dataset}.genes.Rds"
+        sce="data/sce/%s.utrome.genes.Rds" % config['dataset_name']
+    params:
+        genome=config['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        annots=config['annotation_file']
     resources:
         mem_mb=16000
     script:
-        "scripts/sce_txs_to_genes.R"
+        "scripts/mtxs_to_sce_genes.R"
