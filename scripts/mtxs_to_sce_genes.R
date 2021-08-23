@@ -18,12 +18,12 @@ if (interactive()) {
             genes=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.genes.txt"),
             mtxs=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.mtx"),
             gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
-            atlas="extdata/atlas/utrome_genes_annotation.Rds"),
+            gene_annots="extdata/atlas/utrome_genes_annotation.Rds"),
         output=list(sce="data/sce/test.utrome.genes.Rds"),
         params=list(genome='mm10',
                     sample_ids=c("neuron_1k_v2_fastq"),
                     min_umis="500",
-                    annots="examples/neuron_1k_v2_fastq/annots.csv"))
+                    cell_annots="examples/neuron_1k_v2_fastq/annots.csv"))
 }
 
 ################################################################################
@@ -31,7 +31,10 @@ if (interactive()) {
 ################################################################################
 
 ## Row Annotations (UTRs)
-df_atlas <- readRDS(snakemake@input$atlas)
+has_row_annots <- !is.null(snakemake@input$gene_annots)
+if (has_row_annots) {
+    df_gene_annots <- readRDS(snakemake@input$gene_annots)
+}
 
 ## Row Ranges (
 gr_genes <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
@@ -48,11 +51,11 @@ gr_genes <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
     split(.$gene_id)
 
 ## Column Annotations
-df_annots <- snakemake@params$annots %>% {
-    if (file.exists(.)) {
-        read_csv(.) 
-    } else {
+df_cell_annots <- snakemake@params$cell_annots %>% {
+    if (is.null(.)) {
         tibble(cell_id=character(0))
+    } else {
+        read_csv(.) 
     }
 }
 
@@ -85,20 +88,25 @@ sce <- mapply(load_mtx_to_sce,
 
 colData(sce) %<>%
     as_tibble %>%
-    left_join(df_annots, by='cell_id') %>%
+    left_join(df_cell_annots, by='cell_id') %>%
     set_rownames(.$cell_id) %>%
     DataFrame %>%
     `[`(colnames(sce),)
 
+
 ## TODO: Change merge table to use gene_id upstream
 ## switch to gene_id instead of gene_symbol
-sym2id <- df_atlas[,c("gene_symbol", "gene_id")] %>% deframe()
-rownames(sce) <- sym2id[rownames(sce)]
+if (has_row_annots) {
+    sym2id <- df_gene_annots[,c("gene_symbol", "gene_id")] %>% deframe()
+    rownames(sce) <- sym2id[rownames(sce)]
+}
 
 ## attach location info
 rowRanges(sce) <- gr_genes[rownames(sce), ]
 
-rowData(sce) <- df_atlas[rownames(sce), ]
+if (has_row_annots) {
+    rowData(sce) <- df_gene_annots[rownames(sce), ]
+}
 
 ################################################################################
                                         # Export SCE

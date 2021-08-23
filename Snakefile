@@ -1,15 +1,38 @@
 container: "docker://mfansler/scutr-quant:0.1.5"
 configfile: "config.yaml"
 
+from snakemake.io import load_configfile
 import pandas as pd
 import os
+from sys import stderr
+
+# print to stderr
+def message(*args, **kwargs):
+    print(*args, file=stderr, **kwargs)
 
 # make sure the tmp directory exists
 os.makedirs(config['tmp_dir'], exist_ok=True)
 
-print("Loading sample data...")
+# load target configuration
+targets = load_configfile(config['targets_config'])
+
+if config['target'] not in targets:
+    message("[Error] Target '%s' not found!" % config['target'])
+    message("Available targets:", *targets.keys(), sep="\n  ")
+    exit(1)
+
+def get_target_file(key):
+    def f(wcs):
+        if not targets[wcs.target][key]:
+            return []
+        else:
+            return targets[wcs.target]['path'] + targets[wcs.target][key]
+    return f
+
+# load sample data
+message("[INFO] Loading sample data...")
 samples = pd.read_csv(config['sample_file'], index_col='sample_id')
-print("Loaded %d samples." % len(samples.index))
+message("[INFO] Loaded %d samples." % len(samples.index))
 
 wildcard_constraints:
     sample_id=config['sample_regex']
@@ -17,10 +40,12 @@ wildcard_constraints:
     
 rule all:
     input:
-        expand("data/sce/{dataset}.utrome.{output_type}.Rds",
+        expand("data/sce/{target}/{dataset}.{output_type}.Rds",
+               target=config['target'],
                dataset=config['dataset_name'],
                output_type=config['output_type']),
-        expand("qc/umi_count/{sample_id}.umi_count.html",
+        expand("qc/umi_count/{target}/{sample_id}.umi_count.html",
+               target=config['target'],
                sample_id=samples.index.values)
 
 def get_file_type(wildcards):
@@ -31,12 +56,12 @@ def get_sequence_files(wildcards):
 
 rule kallisto_bus:
     input:
-        idx=config['utrome_kdx'],
+        idx=get_target_file('kdx'),
         files=get_sequence_files
     output:
-        bus=temp("data/kallisto/{sample_id}/output.bus"),
-        ec="data/kallisto/{sample_id}/matrix.ec",
-        tx="data/kallisto/{sample_id}/transcripts.txt"
+        bus=temp("data/kallisto/{target}/{sample_id}/output.bus"),
+        ec="data/kallisto/{target}/{sample_id}/matrix.ec",
+        tx="data/kallisto/{target}/{sample_id}/transcripts.txt"
     params:
         tech=config['tech'],
         strand=config['strand'],
@@ -54,9 +79,9 @@ rule kallisto_bus:
 
 rule bustools_sort:
     input:
-        "data/kallisto/{sample_id}/output.bus"
+        "data/kallisto/{target}/{sample_id}/output.bus"
     output:
-        "data/kallisto/{sample_id}/output.sorted.bus"
+        "data/kallisto/{target}/{sample_id}/output.sorted.bus"
     params:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
     threads: 4
@@ -69,9 +94,9 @@ rule bustools_sort:
 
 rule bustools_whitelist:
     input:
-        "data/kallisto/{sample_id}/output.sorted.bus"
+        "data/kallisto/{target}/{sample_id}/output.sorted.bus"
     output:
-        "data/kallisto/{sample_id}/whitelist.txt"
+        "data/kallisto/{target}/{sample_id}/whitelist.txt"
     shell:
         """
         bustools whitelist -o {output} {input}
@@ -85,10 +110,10 @@ def get_whitelist(wildcards):
     
 rule bustools_correct:
     input:
-        bus="data/kallisto/{sample_id}/output.sorted.bus",
+        bus="data/kallisto/{target}/{sample_id}/output.sorted.bus",
         bxs=get_whitelist
     output:
-        temp("data/kallisto/{sample_id}/output.corrected.bus")
+        temp("data/kallisto/{target}/{sample_id}/output.corrected.bus")
     shell:
         """
         bustools correct -w {input.bxs} -o {output} {input.bus}
@@ -96,9 +121,9 @@ rule bustools_correct:
 
 rule bustools_correct_sort:
     input:
-        "data/kallisto/{sample_id}/output.corrected.bus"
+        "data/kallisto/{target}/{sample_id}/output.corrected.bus"
     output:
-        temp("data/kallisto/{sample_id}/output.corrected.sorted.bus")
+        temp("data/kallisto/{target}/{sample_id}/output.corrected.sorted.bus")
     params:
         tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
     threads: 4
@@ -111,40 +136,40 @@ rule bustools_correct_sort:
 
 rule generate_tx_merge:
     input:
-        config['utrome_merge']
+        tsv=get_target_file('merge_tsv')
     output:
-        "data/utrs/utrome_tx_merge.tsv"
+        "data/utrs/{target}/tx_merge.tsv"
     shell:
         """
-        tail -n+2 {input} | cut -f1,2 > {output}
+        tail -n+2 {input.tsv} | cut -f1,2 > {output}
         """
 
 rule generate_gene_merge:
     input:
-        config['utrome_merge']
+        tsv=get_target_file('merge_tsv')
     output:
-        "data/utrs/utrome_gene_merge.tsv"
+        "data/utrs/{target}/gene_merge.tsv"
     shell:
         """
-        tail -n+2 {input} | cut -f1,3 > {output}
+        tail -n+2 {input.tsv} | cut -f1,3 > {output}
         """
 
 def get_input_busfile(wildcards):
     if config['correct_bus']:
-        return "data/kallisto/%s/output.corrected.sorted.bus" % wildcards.sample_id
+        return "data/kallisto/%s/%s/output.corrected.sorted.bus" % (wildcards.target, wildcards.sample_id)
     else:
-        return "data/kallisto/%s/output.sorted.bus" % wildcards.sample_id
+        return "data/kallisto/%s/%s/output.sorted.bus" % (wildcards.target, wildcards.sample_id)
 
 rule bustools_count_txs:
     input:
         bus=get_input_busfile,
-        txs="data/kallisto/{sample_id}/transcripts.txt",
-        ec="data/kallisto/{sample_id}/matrix.ec",
-        merge="data/utrs/utrome_tx_merge.tsv"
+        txs="data/kallisto/{target}/{sample_id}/transcripts.txt",
+        ec="data/kallisto/{target}/{sample_id}/matrix.ec",
+        merge="data/utrs/{target}/tx_merge.tsv"
     output:
-        mtx="data/kallisto/{sample_id}/utrome.txs.mtx",
-        txs="data/kallisto/{sample_id}/utrome.txs.genes.txt",
-        bxs="data/kallisto/{sample_id}/utrome.txs.barcodes.txt"
+        mtx="data/kallisto/{target}/{sample_id}/txs.mtx",
+        txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
+        bxs="data/kallisto/{target}/{sample_id}/txs.barcodes.txt"
     shell:
         """
         filename={output.mtx}
@@ -155,13 +180,13 @@ rule bustools_count_txs:
 rule bustools_count_genes:
     input:
         bus=get_input_busfile,
-        txs="data/kallisto/{sample_id}/transcripts.txt",
-        ec="data/kallisto/{sample_id}/matrix.ec",
-        merge="data/utrs/utrome_gene_merge.tsv"
+        txs="data/kallisto/{target}/{sample_id}/transcripts.txt",
+        ec="data/kallisto/{target}/{sample_id}/matrix.ec",
+        merge="data/utrs/{target}/gene_merge.tsv"
     output:
-        mtx="data/kallisto/{sample_id}/utrome.genes.mtx",
-        txs="data/kallisto/{sample_id}/utrome.genes.genes.txt",
-        bxs="data/kallisto/{sample_id}/utrome.genes.barcodes.txt"
+        mtx="data/kallisto/{target}/{sample_id}/genes.mtx",
+        txs="data/kallisto/{target}/{sample_id}/genes.genes.txt",
+        bxs="data/kallisto/{target}/{sample_id}/genes.barcodes.txt"
     shell:
         """
         filename={output.mtx}
@@ -171,30 +196,33 @@ rule bustools_count_genes:
 
 rule report_umis_per_cell:
     input:
-        bxs="data/kallisto/{sample_id}/utrome.txs.barcodes.txt",
-        txs="data/kallisto/{sample_id}/utrome.txs.genes.txt",
-        mtx="data/kallisto/{sample_id}/utrome.txs.mtx"
+        bxs="data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
+        txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
+        mtx="data/kallisto/{target}/{sample_id}/txs.mtx"
     params:
         min_umis=config['min_umis']
     output:
-        "qc/umi_count/{sample_id}.umi_count.html"
+        "qc/umi_count/{target}/{sample_id}.umi_count.html"
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
 
 rule mtxs_to_sce_txs:
     input:
-        bxs=expand("data/kallisto/{sample_id}/utrome.txs.barcodes.txt", sample_id=samples.index.values),
-        txs=expand("data/kallisto/{sample_id}/utrome.txs.genes.txt", sample_id=samples.index.values),
-        mtxs=expand("data/kallisto/{sample_id}/utrome.txs.mtx", sample_id=samples.index.values),
-        gtf=config['utrome_gtf'],
-        atlas=config['atlas_txs']
+        bxs=expand("data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        txs=expand("data/kallisto/{target}/{sample_id}/txs.genes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/txs.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        tx_annots=get_target_file('tx_annots')
     output:
-        sce="data/sce/%s.utrome.txs.Rds" % config['dataset_name']
+        sce="data/sce/{target}/%s.txs.Rds" % config['dataset_name']
     params:
-        genome=config['genome'],
+        genome=lambda wcs: targets[wcs.target]['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
-        annots=config['annotation_file']
+        cell_annots=config['cell_annots']
     resources:
         mem_mb=16000
     script:
@@ -202,18 +230,21 @@ rule mtxs_to_sce_txs:
 
 rule mtxs_to_sce_genes:
     input:
-        bxs=expand("data/kallisto/{sample_id}/utrome.genes.barcodes.txt", sample_id=samples.index.values),
-        genes=expand("data/kallisto/{sample_id}/utrome.genes.genes.txt", sample_id=samples.index.values),
-        mtxs=expand("data/kallisto/{sample_id}/utrome.genes.mtx", sample_id=samples.index.values),
-        gtf=config['utrome_gtf'],
-        atlas=config['atlas_genes']
+        bxs=expand("data/kallisto/{target}/{sample_id}/genes.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        genes=expand("data/kallisto/{target}/{sample_id}/genes.genes.txt",
+                     sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/genes.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        gene_annots=get_target_file('gene_annots')
     output:
-        sce="data/sce/%s.utrome.genes.Rds" % config['dataset_name']
+        sce="data/sce/{target}/%s.genes.Rds" % config['dataset_name']
     params:
-        genome=config['genome'],
+        genome=lambda wcs: targets[wcs.target]['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
-        annots=config['annotation_file']
+        cell_annots=config['cell_annots']
     resources:
         mem_mb=16000
     script:
