@@ -1,42 +1,12 @@
-tmp_dir:
-  "/tmp"
-
-genome:
-  "mm10"
-
-utrome_gtf:
-  "extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf"
-
-utrome_kdx:
-  "extdata/kallisto/adult.utrome.e3.t200.f0.999.w500.kdx"
-
-utrome_merge:
-  "extdata/gff/adult.utrome.e3.t200.f0.999.w500.merge.tsv"
-
-atlas_txs:
-  "extdata/atlas/utrome_txs_annotation.Rds"
-
-atlas_genes:
-  "extdata/atlas/utrome_genes_annotation.Rds"
-
-sample_regex:
-  ".*"
-
-dataset_name:
-  "output"
-
+dataset_name: "output"
+sample_regex: ".*"
+cell_annots: null
+target: "utrome_mm10_v1"
 output_type:
   - "txs"
   - "genes"
-
-bx_whitelist:
-  ""
-
-annotation_file:
-  ""
-
-correct_bus:
-  True
-
-min_umis:
-  500
+tmp_dir: "/tmp"
+bx_whitelist: null
+correct_bus: True
+min_umis: 500
+targets_config: "extdata/targets/targets.yaml"

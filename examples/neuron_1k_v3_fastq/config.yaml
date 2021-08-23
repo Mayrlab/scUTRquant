@@ -1,20 +1,9 @@
-dataset_name:
-  "neuron_1k_v3_fastq"
+dataset_name: "neuron_1k_v3_fastq"
+sample_file: "examples/neuron_1k_v3_fastq/sample_sheet.csv"
+cell_annots: "examples/neuron_1k_v3_fastq/annots.csv"
 
-sample_file:
-  "examples/neuron_1k_v3_fastq/sample_sheet.csv"
+bx_whitelist: "extdata/bxs/3M-february-2018.txt"
+tech: "10xv3"
+strand: "--fr-stranded"
 
-annotation_file:
-  "examples/neuron_1k_v3_fastq/annots.csv"
-
-bx_whitelist:
-  "extdata/bxs/3M-february-2018.txt"
-
-tech:
-  "10xv3"
-
-strand:
-  "--fr-stranded"
-
-min_umis:
-  1000
+min_umis: 1000

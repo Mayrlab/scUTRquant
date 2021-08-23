@@ -21,12 +21,12 @@ if (interactive()) {
             mtxs=c("data/kallisto/day5_DP_1/utrome.txs.mtx",
                    "data/kallisto/day6_SP_1/utrome.txs.mtx"),
             gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
-            atlas="extdata/atlas/utrome_txs_annotation.Rds"),
+            tx_annots="extdata/atlas/utrome_txs_annotation.Rds"),
         output=list(sce="data/sce/test.utrome.txs.Rds"),
         params=list(genome='mm10',
                     sample_ids=c("day5_DP_1", "day6_SP_1"),
                     min_umis="500",
-                    annots="metadata/dahlin18_wolf19_annots.csv"))
+                    cell_annots="metadata/dahlin18_wolf19_annots.csv"))
 }
 
 ################################################################################
@@ -34,10 +34,13 @@ if (interactive()) {
 ################################################################################
 
 ## Row Annotations (UTRs)
-df_atlas <- readRDS(snakemake@input$atlas)
+has_row_annots <- !is.null(snakemake@input$tx_annots)
+if (has_row_annots) {
+    df_tx_annots <- readRDS(snakemake@input$tx_annots)
+}
 
 ## Row Ranges (
-gr_utrs <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
+gr_txs <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
                     col_names=c('type', 'transcript_id')) %>%
 
     ## keep only transcripts
@@ -48,11 +51,11 @@ gr_utrs <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
     `names<-`(.$transcript_id)
 
 ## Column Annotations
-df_annots <- snakemake@params$annots %>% {
-    if (file.exists(.)) {
-        read_csv(.) 
-    } else {
+df_cell_annots <- snakemake@params$cell_annots %>% {
+    if (is.null(.)) {
         tibble(cell_id=character(0))
+    } else {
+        read_csv(.) 
     }
 }
 
@@ -85,14 +88,16 @@ sce <- mapply(load_mtx_to_sce,
 
 colData(sce) %<>%
     as_tibble %>%
-    left_join(df_annots, by='cell_id') %>%
+    left_join(df_cell_annots, by='cell_id') %>%
     set_rownames(.$cell_id) %>%
     DataFrame %>%
     `[`(colnames(sce),)
 
-rowRanges(sce) <- gr_utrs[rownames(sce), ]
+rowRanges(sce) <- gr_txs[rownames(sce), ]
 
-rowData(sce) <- df_atlas[rownames(sce), ]
+if (has_row_annots) {
+    rowData(sce) <- df_tx_annots[rownames(sce), ]
+}
 
 ################################################################################
                                         # Export SCE
