@@ -16,8 +16,10 @@ os.makedirs(config['tmp_dir'], exist_ok=True)
 # load target configuration
 targets = load_configfile(config['targets_config'])
 
-if config['target'] not in targets:
-    message("[Error] Target '%s' not found!" % config['target'])
+# check for valid target(s)
+target_list = [config['target']] if isinstance(config['target'], str) else config['target']
+if not set(target_list).issubset(targets.keys()):
+    message("[Error] Some target(s) '%s' not found!" % config['target'])
     message("Available targets:", *targets.keys(), sep="\n  ")
     exit(1)
 
@@ -41,11 +43,11 @@ wildcard_constraints:
 rule all:
     input:
         expand("data/sce/{target}/{dataset}.{output_type}.Rds",
-               target=config['target'],
+               target=target_list,
                dataset=config['dataset_name'],
                output_type=config['output_type']),
         expand("qc/umi_count/{target}/{sample_id}.umi_count.html",
-               target=config['target'],
+               target=target_list,
                sample_id=samples.index.values)
 
 def get_file_type(wildcards):
