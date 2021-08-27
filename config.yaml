@@ -5,7 +5,7 @@ target: "utrome_mm10_v1"
 output_type:
   - "txs"
   - "genes"
-tmp_dir: "/tmp"
+tmp_dir: "/fscratch/fanslerm"
 bx_whitelist: null
 correct_bus: True
 min_umis: 500
