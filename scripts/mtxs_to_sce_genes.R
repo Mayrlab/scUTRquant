@@ -14,16 +14,16 @@ if (interactive()) {
     Snakemake <- setClass("Snakemake", slots=c(input='list', output='list', params='list'))
     snakemake <- Snakemake(
         input=list(
-            bxs=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.barcodes.txt"),
-            genes=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.genes.txt"),
-            mtxs=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.mtx"),
-            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
-            gene_annots="extdata/atlas/utrome_genes_annotation.Rds"),
-        output=list(sce="data/sce/test.utrome.genes.Rds"),
+            bxs=c("data/kallisto/utrome_mm10_v1_unfiltered/heart_1k_v2_fastq/genes.barcodes.txt"),
+            genes=c("data/kallisto/utrome_mm10_v1_unfiltered/heart_1k_v2_fastq/genes.genes.txt"),
+            mtxs=c("data/kallisto/utrome_mm10_v1_unfiltered/heart_1k_v2_fastq/genes.mtx"),
+            gtf="extdata/targets/utrome_mm10_v1_unfiltered/adult.utrome.e3.t200.f0.0.w500.gtf",
+            gene_annots=NULL),
+        output=list(sce="/fscratch/fanslerm/test.genes.Rds"),
         params=list(genome='mm10',
-                    sample_ids=c("neuron_1k_v2_fastq"),
+                    sample_ids=c("heart_1k_v2_fastq"),
                     min_umis="500",
-                    cell_annots="examples/neuron_1k_v2_fastq/annots.csv"))
+                    cell_annots="examples/heart_1k_v2_fastq/annots.csv"))
 }
 
 ################################################################################

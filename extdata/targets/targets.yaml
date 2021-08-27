@@ -15,3 +15,21 @@ gencode_vM21_w500:
   merge_tsv: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.merge.tsv"
   tx_annots: null
   gene_annots: null
+
+utrome_mm10_v1_unfiltered:
+  path: "extdata/targets/utrome_mm10_v1_unfiltered/"  # files should be relative to this
+  genome: "mm10"
+  gtf: "adult.utrome.e3.t200.f0.0.w500.gtf"
+  kdx: "adult.utrome.e3.t200.f0.0.w500.kdx"
+  merge_tsv: "adult.utrome.e3.t200.f0.0.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+  
+utrome_mm10_v1_fulllength:
+  path: "extdata/targets/utrome_mm10_v1_fulllength/"  # files should be relative to this
+  genome: "mm10"
+  gtf: "adult.utrome.e3.t200.f0.999.w0.gtf"
+  kdx: "adult.utrome.e3.t200.f0.999.w0.kdx"
+  merge_tsv: "adult.utrome.e3.t200.f0.999.w0.merge.tsv"
+  tx_annots: null
+  gene_annots: null
