@@ -127,7 +127,7 @@ rule bustools_correct_sort:
     output:
         temp("data/kallisto/{target}/{sample_id}/output.corrected.sorted.bus")
     params:
-        tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.sample_id
+        tmpDir=lambda wcs: config['tmp_dir'] + "/bs-utrome-sort" + wcs.target + "-" + wcs.sample_id
     threads: 4
     resources:
         mem_mb=2000
