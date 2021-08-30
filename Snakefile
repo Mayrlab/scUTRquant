@@ -261,3 +261,15 @@ rule mtxs_to_sce_genes:
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
+
+rule count_ambiguities:
+    input:
+        ec="data/kallisto/{target}/{sample_id}/matrix.ec",
+        txs="data/kallisto/{target}/{sample_id}/transcripts.txt",
+        merge="data/utrs/{target}/{level}_merge.tsv"
+    output:
+        tsv="qc/kallisto/multimapping/{target}/{sample_id}/{level}_multimapping.tsv.gz"
+    wildcard_constraints:
+        level="(gene|tx)"
+    script:
+        "scripts/count_ambiguities.R"
