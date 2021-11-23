@@ -71,6 +71,7 @@ rule kallisto_bus:
     threads: 16
     resources:
         mem_mb=1000
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         outDir=$(dirname {output.bus})
@@ -89,6 +90,7 @@ rule bustools_sort:
     threads: 4
     resources:
         mem_mb=2000
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
@@ -99,6 +101,7 @@ rule bustools_whitelist:
         "data/kallisto/{target}/{sample_id}/output.sorted.bus"
     output:
         "data/kallisto/{target}/{sample_id}/whitelist.txt"
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         bustools whitelist -o {output} {input}
@@ -116,6 +119,7 @@ rule bustools_correct:
         bxs=get_whitelist
     output:
         temp("data/kallisto/{target}/{sample_id}/output.corrected.bus")
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         bustools correct -w {input.bxs} -o {output} {input.bus}
@@ -131,6 +135,7 @@ rule bustools_correct_sort:
     threads: 4
     resources:
         mem_mb=2000
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
@@ -172,6 +177,7 @@ rule bustools_count_txs:
         mtx="data/kallisto/{target}/{sample_id}/txs.mtx",
         txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
         bxs="data/kallisto/{target}/{sample_id}/txs.barcodes.txt"
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         filename={output.mtx}
@@ -189,6 +195,7 @@ rule bustools_count_genes:
         mtx="data/kallisto/{target}/{sample_id}/genes.mtx",
         txs="data/kallisto/{target}/{sample_id}/genes.genes.txt",
         bxs="data/kallisto/{target}/{sample_id}/genes.barcodes.txt"
+    conda: "envs/kallisto-bustools.yaml"
     shell:
         """
         filename={output.mtx}
@@ -205,6 +212,7 @@ rule report_umis_per_cell:
         min_umis=config['min_umis']
     output:
         "qc/umi_count/{target}/{sample_id}.umi_count.html"
+    conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
 
@@ -227,6 +235,7 @@ rule mtxs_to_sce_txs:
         cell_annots=config['cell_annots']
     resources:
         mem_mb=16000
+    conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_txs.R"
 
@@ -249,5 +258,6 @@ rule mtxs_to_sce_genes:
         cell_annots=config['cell_annots']
     resources:
         mem_mb=16000
+    conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
