@@ -102,13 +102,13 @@ This configuration requires installing:
     and referenced by the `bx_whitelist` variable in the `configfile`.
 
 # Running Examples
-Examples are provided in the `scutr-quant/examples` folder. Each includes a script
+Examples are provided in the `scUTRquant/examples` folder. Each includes a script
 for downloading the raw data, a `sample_sheet.csv` formatted for use in the pipeline,
 and a `config.yaml` file for running the pipeline.
 
 Look for output files in the `qc/` and `data/` folders.
 
-Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
+Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 
 ## 1K Neurons (10xv3) - BAM
 
