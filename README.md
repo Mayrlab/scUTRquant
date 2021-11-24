@@ -80,12 +80,12 @@ This configuration requires installing:
 ## Installation
 1. Clone the repository.
     ```
-    git clone git@github.com:mfansler/scutr-quant.git
+    git clone git@github.com:Mayrlab/scUTRquant.git
     ```
 
 2. Download the UTRome annotation, kallisto index, and merge file.
     ```
-    cd scutr-quant/extdata
+    cd scUTRquant/extdata/targets/utrome_mm10_v1
     . download_utrome.sh
     ```
     **Reuse Tip:** For use across multiple projects, it is recommended to centralize 
@@ -95,7 +95,7 @@ This configuration requires installing:
 
 3. (Optional) Download the barcode whitelists.
     ```
-    cd scutr-quant/extdata/bxs
+    cd scUTRquant/extdata/bxs
     . download_10X_whitelists.sh
     ```
     **Reuse Tip:** Similar to the UTRome files, these can also be centralized
@@ -114,7 +114,7 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 
 1. Download the raw data.
     ```
-    cd scutr-quant/examples/neuron_1k_v3_bam/
+    cd scUTRquant/examples/neuron_1k_v3_bam/
     . download.sh
     ```
 
@@ -122,7 +122,7 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 
    **Conda Mode**
     ```
-    cd scutr-quant
+    cd scUTRquant
     snakemake --use-conda --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
 
@@ -136,7 +136,7 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 
 1. Download the raw data.
     ```
-    cd scutr-quant/examples/heart_1k_v3_fastq/
+    cd scUTRquant/examples/heart_1k_v3_fastq/
     . download.sh
     ```
 
@@ -144,14 +144,14 @@ Note that the `config.yaml` uses paths relative to the `scutr-quant` folder.
 
    **Conda Mode**
     ```
-    cd scutr-quant
-    snakemake --use-conda --configfile examples/heart_1k_v3_bam/config.yaml
+    cd scUTRquant
+    snakemake --use-conda --configfile examples/heart_1k_v3_fastq/config.yaml
     ```
 
    **Singularity Mode**
     ```
-    cd scutr-quant
-    snakemake --use-singularity --configfile examples/heart_1k_v3_bam/config.yaml
+    cd scUTRquant
+    snakemake --use-singularity --configfile examples/heart_1k_v3_fastq/config.yaml
     ```
 
 
@@ -181,11 +181,11 @@ pipeline. The following keys are expected:
 
 Snakemake can draw values for `config` in three ways:
 
- 1. `scutr-quant/config.yaml`: This file is listed as the `configfile` in the Snakefile. 
+ 1. `scUTRquant/config.yaml`: This file is listed as the `configfile` in the Snakefile. 
  2. `--configfile config.yaml`: The file provided at the commandline.
  3. `--config argument=value`: A specific value for an argument 
  
-This list runs from lowest to highest precedence. Configuration values that do not differ from those in `scutr-quant/config.yaml` can be left unspecfied in the YAML given by the `--configfile` argument. That is, one can use the `scutr-quant/config.yaml` to define shared settings, and only list dataset-specific config values in the dataset's YAML.
+This list runs from lowest to highest precedence. Configuration values that do not differ from those in `scUTRquant/config.yaml` can be left unspecfied in the YAML given by the `--configfile` argument. That is, one can use the `scUTRquant/config.yaml` to define shared settings, and only list dataset-specific config values in the dataset's YAML.
 
 ## Sample File
 
@@ -210,6 +210,7 @@ The `extdata/targets.yaml` defines the targets available to pseudoalign to. The 
  - `merge`: TSV for merging features (isoforms)
  - `tx_annots`: RDS file containing Bioconductor DataFrame object with annotations for transcripts
  - `gene_annots`: RDS file containing Bioconductor DataFrame object with annotations for genes
+
 
 # Customization
 
