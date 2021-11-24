@@ -79,12 +79,12 @@ This configuration requires installing:
 
 ## Installation
 1. Clone the repository.
-    ```
+    ```bash
     git clone git@github.com:Mayrlab/scUTRquant.git
     ```
 
 2. Download the UTRome annotation, kallisto index, and merge file.
-    ```
+    ```bash
     cd scUTRquant/extdata/targets/utrome_mm10_v1
     . download_utrome.sh
     ```
@@ -94,7 +94,7 @@ This configuration requires installing:
     case, one does not need to redownload the files.
 
 3. (Optional) Download the barcode whitelists.
-    ```
+    ```bash
     cd scUTRquant/extdata/bxs
     . download_10X_whitelists.sh
     ```
@@ -113,7 +113,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 ## 1K Neurons (10xv3) - BAM
 
 1. Download the raw data.
-    ```
+    ```bash
     cd scUTRquant/examples/neuron_1k_v3_bam/
     . download.sh
     ```
@@ -121,13 +121,13 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 2. Run the pipeline.
 
    **Conda Mode**
-    ```
+    ```bash
     cd scUTRquant
     snakemake --use-conda --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
 
    **Singularity Mode**
-    ```
+    ```bash
     cd scutr-quant
     snakemake --use-singularity --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
@@ -135,7 +135,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 ## 1K Heart (10xv3) - FASTQ
 
 1. Download the raw data.
-    ```
+    ```bash
     cd scUTRquant/examples/heart_1k_v3_fastq/
     . download.sh
     ```
@@ -143,13 +143,13 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 2. Run the pipeline.
 
    **Conda Mode**
-    ```
+    ```bash
     cd scUTRquant
     snakemake --use-conda --configfile examples/heart_1k_v3_fastq/config.yaml
     ```
 
    **Singularity Mode**
-    ```
+    ```bash
     cd scUTRquant
     snakemake --use-singularity --configfile examples/heart_1k_v3_fastq/config.yaml
     ```
