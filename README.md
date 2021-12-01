@@ -32,7 +32,7 @@ only the last 500 nts of each transcript and then deduplicated. Finally, the mer
 information on transcripts whose cleavage sites differ by fewer than 200 nts, which corresponds 
 to the empirical resolution limit for `kallisto` quantification as determined by simulations.
 
-Please see [our accompanying manuscript](https://doi.org/10.1101/2021.11.22.469635) for more details.
+Please see [our accompanying manuscript][ref:scUTRquant] for more details.
 
 ## Outputs
 The primary output of the pipeline is a Bioconductor `SingleCellExperiment` object.
@@ -58,7 +58,7 @@ The pipeline can use either Conda/Mamba or Singularity to provide the required s
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
 
- - [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html)
+ - [Snakemake][ref:snakemake] >= 5.11
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
@@ -73,18 +73,18 @@ conda install -n base -c conda-forge mamba
 Snakemake can use the pre-built scUTRsquant Docker image to provide all additional software.
 This configuration requires installing:
 
- - [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html)
+ - [Snakemake][ref:snakemake] >= 5.11
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
 ## Installation
 1. Clone the repository.
-    ```bash
+    ```
     git clone git@github.com:Mayrlab/scUTRquant.git
     ```
 
 2. Download the UTRome annotation, kallisto index, and merge file.
-    ```bash
+    ```
     cd scUTRquant/extdata/targets/utrome_mm10_v1
     . download_utrome.sh
     ```
@@ -94,7 +94,7 @@ This configuration requires installing:
     case, one does not need to redownload the files.
 
 3. (Optional) Download the barcode whitelists.
-    ```bash
+    ```
     cd scUTRquant/extdata/bxs
     . download_10X_whitelists.sh
     ```
@@ -113,7 +113,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 ## 1K Neurons (10xv3) - BAM
 
 1. Download the raw data.
-    ```bash
+    ```
     cd scUTRquant/examples/neuron_1k_v3_bam/
     . download.sh
     ```
@@ -121,13 +121,13 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 2. Run the pipeline.
 
    **Conda Mode**
-    ```bash
+    ```
     cd scUTRquant
     snakemake --use-conda --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
 
    **Singularity Mode**
-    ```bash
+    ```
     cd scutr-quant
     snakemake --use-singularity --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
@@ -135,7 +135,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 ## 1K Heart (10xv3) - FASTQ
 
 1. Download the raw data.
-    ```bash
+    ```
     cd scUTRquant/examples/heart_1k_v3_fastq/
     . download.sh
     ```
@@ -143,13 +143,13 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 2. Run the pipeline.
 
    **Conda Mode**
-    ```bash
+    ```
     cd scUTRquant
     snakemake --use-conda --configfile examples/heart_1k_v3_fastq/config.yaml
     ```
 
    **Singularity Mode**
-    ```bash
+    ```
     cd scUTRquant
     snakemake --use-singularity --configfile examples/heart_1k_v3_fastq/config.yaml
     ```
@@ -167,6 +167,8 @@ pipeline. The following keys are expected:
  - `sample_regex`: regular expression used to match sample IDs; including a specific
      regex helps to constrain Snakemake's DAG-generation
  - `output_type`: a list of outputs, including `"txs"` and/or `"genes"`
+ - `target`: name of target(s) to which to pseudoalign; valid targets are defined in 
+     the `extdata/targets/targets.yaml`; multiple targets can be specified in list format
  - `tech`: argument to `kallisto bus` indicating the scRNA-seq technology; see
      [the documentation](https://pachterlab.github.io/kallisto/manual#bus) for supported values
  - `strand`: argument to `kallisto bus` indicating the orientation of sequence reads
@@ -200,6 +202,7 @@ with at least the following columns:
      ```
      lane1_R1.fastq;lane1_R2.fastq;lane2_R1.fastq;lane2_R2.fastq;...
      ```
+
 ## Targets File
 The `extdata/targets.yaml` defines the targets available to pseudoalign to. The default configuration provides `utrome_mm10_v1`, but additional entries can be added. A target has the following fields:
 
@@ -208,18 +211,69 @@ The `extdata/targets.yaml` defines the targets available to pseudoalign to. The 
  - `gtf`: GTF annotation of UTRome; used in annotating rows
  - `kdx`: Kallisto index for UTRome
  - `merge`: TSV for merging features (isoforms)
- - `tx_annots`: RDS file containing Bioconductor DataFrame object with annotations for transcripts
- - `gene_annots`: RDS file containing Bioconductor DataFrame object with annotations for genes
+ - `tx_annots`: (optional) RDS file containing Bioconductor DataFrame object with annotations for transcripts
+ - `gene_annots`: (optional) RDS file containing Bioconductor DataFrame object with annotations for genes
 
 
 # Customization
+## Creating Custom Targets
+The [Bioconductor package `txcutr`][ref:txcutr] provides methods for generating truncated transcriptome 
+annotations. The [txcutr-db repository](https://github.com/Mayrlab/txcutr-db) provides an example Snakemake 
+pipeline for using `txcutr` to generate the files needed for the custom target, starting from Ensembl or 
+GENCODE annotations.
 
-The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](https://github.com/Snakemake-Profiles) for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust to fit the resources available on the deployment cluster. We strongly recommend that cluster profiles include both `--use-singularity` and `--use-conda` flags by default. Following this recommendation, an example run, for instance on **neuron_1k_v3_fastq**, with profile name `profile_name`, would take the form:
+> **Recommendations:** For 10X Chromium 3' Single Cell libraries, we use a 500 nt truncation length
+> and a 200 nt merge distance (details in [the sqUTRquant manuscript][ref:scUTRquant]). We recommend
+> filtering transcripts to only protein-coding transcripts with validated 3' ends. For GENCODE, this
+> means requiring `transcript_type "protein_coding"` and excluding transcripts with the tag **mRNA_end_NF**.
+
+Once the GTF, KDX, and TSV files are generated, we recommend placing them in a new folder under `extdata/targets`.
+Then, edit the `extdata/targets/targets.yaml` to include a new entry. This will look something like:
+
+**extdata/targets/targets.yaml**
+```yaml
+custom_target_name:
+  path: "extdata/targets/custom_target_name/"
+  genome: "mm10"
+  gtf: "custom_target.gtf"
+  kdx: "custom_target.kdx"
+  merge_tsv: "custom_target.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+```
+
+Note that the pipeline supports running on multiple targets in parallel. This can be done in the  
+configuration file, like so,
+
+**config.yaml**
+```yaml
+target:
+  - target1
+  - target2
+# ...
+```
+
+Or, if specifying targets at Snakemake invocation, one would use the syntax:
+
+```bash
+snakemake --config target='[target1,target2]' # ...
+```
+
+## Snakemake Cluster Profiles
+The rules in the `Snakefile` include `threads` and `resources` arguments per rule. These values are compatible for use with [Snakemake profiles](https://github.com/Snakemake-Profiles) for cluster deployment. The current defaults will attempt to use up to 16 threads and 16GB of memory in the `kallisto bus` step. Please adjust to fit the resources available on the deployment cluster. We recommend that cluster profiles include both `--use-singularity` and `--use-conda` flags by default. Following this recommendation, an example run, for instance on **neuron_1k_v3_fastq**, with profile name `profile_name`, would take the form:
 
 ```bash
 snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config.yaml
 ```
 
+
 # Citation
 
 Fansler, M. M., Zhen, G., & Mayr, C. (2021). Quantification of alternative 3′UTR isoforms from single cell RNA-seq data with scUTRquant. *BioRxiv*, 2021.11.22.469635. https://doi.org/10.1101/2021.11.22.469635
+
+
+<!-- References -->
+
+[ref:scUTRquant]: https://doi.org/10.1101/2021.11.22.469635
+[ref:snakemake]: https://snakemake.readthedocs.io/en/stable/index.html
+[ref:txcutr]: https://doi.org/doi:10.18129/B9.bioc.txcutr
