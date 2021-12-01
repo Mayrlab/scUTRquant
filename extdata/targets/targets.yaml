@@ -107,3 +107,14 @@ utrome_hg38_e10_t100:
   merge_tsv: "gff/utrome.e10.t100.gc39.pas3.f0.9999.w500.m200.tsv"
   tx_annots: null
   gene_annots: null
+
+## example custom target using GENCODE
+## see https://github.com/Mayrlab/txcutr-db
+# gencode_v38_pc_w500:
+#   path: "extdata/targets/gencode_v38_pc_w500/"
+#   genome: "hg38"
+#   gtf: "gencode.v38.annotation.pc.txcutr.w500.gtf"
+#   kdx: "gencode.v38.annotation.pc.txcutr.w500.kdx"
+#   merge_tsv: "gencode.v38.annotation.pc.txcutr.w500.merge.tsv"
+#   tx_annots: null
+#   gene_annots: null
