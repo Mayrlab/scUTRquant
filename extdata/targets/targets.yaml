@@ -7,11 +7,13 @@ utrome_mm10_v1:
   tx_annots: "utrome_txs_annotation.Rds"
   gene_annots: "utrome_genes_annotation.Rds"
   
-gencode_vM21_w500:
-  path: "extdata/targets/gencode_vM21_w500/"
-  genome: "mm10"
-  gtf: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.gtf"
-  kdx: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.kdx"
-  merge_tsv: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.merge.tsv"
-  tx_annots: null
-  gene_annots: null
+## example custom target using GENCODE
+## see https://github.com/Mayrlab/txcutr-db
+# gencode_v38_pc_w500:
+#   path: "extdata/targets/gencode_v38_pc_w500/"
+#   genome: "hg38"
+#   gtf: "gencode.v38.annotation.pc.txcutr.w500.gtf"
+#   kdx: "gencode.v38.annotation.pc.txcutr.w500.kdx"
+#   merge_tsv: "gencode.v38.annotation.pc.txcutr.w500.merge.tsv"
+#   tx_annots: null
+#   gene_annots: null
