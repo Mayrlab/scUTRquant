@@ -44,3 +44,48 @@ utrome_mm10_v1_fulllength:
   merge_tsv: "adult.utrome.e3.t200.f0.999.w0.merge.tsv"
   tx_annots: null
   gene_annots: null
+
+ensembl_104_hg38_w500:
+  path: "extdata/targets/ensembl_104_hg38_w500/"
+  genome: "hg38"
+  gtf: "Homo_sapiens.GRCh38.104.txcutr.w500.gtf"
+  kdx: "Homo_sapiens.GRCh38.104.txcutr.w500.kdx"
+  merge_tsv: "Homo_sapiens.GRCh38.104.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+
+cellranger_300_hg38_w500:
+  path: "extdata/targets/cellranger_300_hg38_w500/"
+  genome: "hg38"
+  gtf: "Homo_sapiens.GRCh38.93.cr_3_0_0.txcutr.w500.gtf"
+  kdx: "Homo_sapiens.GRCh38.93.cr_3_0_0.txcutr.w500.kdx"
+  merge_tsv: "Homo_sapiens.GRCh38.93.cr_3_0_0.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+
+cellranger_300_mm10_w500:
+  path: "extdata/targets/cellranger_300_mm10_w500/"
+  genome: "mm10"
+  gtf: "Mus_musculus.GRCm38.93.cr_3_0_0.txcutr.w500.gtf"
+  kdx: "Mus_musculus.GRCm38.93.cr_3_0_0.txcutr.w500.kdx"
+  merge_tsv: "Mus_musculus.GRCm38.93.cr_3_0_0.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+
+gencode_v38_w500:
+  path: "extdata/targets/gencode_v38_w500/"
+  genome: "hg38"
+  gtf: "gencode.v38.annotation.txcutr.w500.gtf.gz"
+  kdx: "gencode.v38.annotation.txcutr.w500.kdx"
+  merge_tsv: "gencode.v38.annotation.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+
+gencode_v38_pc_w500:
+  path: "extdata/targets/gencode_v38_pc_w500/"
+  genome: "hg38"
+  gtf: "gencode.v38.annotation.pc.txcutr.w500.gtf.gz"
+  kdx: "gencode.v38.annotation.pc.txcutr.w500.kdx"
+  merge_tsv: "gencode.v38.annotation.pc.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
