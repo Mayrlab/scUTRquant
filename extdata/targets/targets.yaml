@@ -89,3 +89,21 @@ gencode_v38_pc_w500:
   merge_tsv: "gencode.v38.annotation.pc.txcutr.w500.merge.tsv"
   tx_annots: null
   gene_annots: null
+
+utrome_hg38_e5_t1000:
+  path: "/data/mayrc/data/hcl/"
+  genome: "hg38"
+  gtf: "gff/utrome.e5.t1000.gc39.pas3.f0.9999.w500.gtf"
+  kdx: "kdx/utrome.e5.t1000.gc39.pas3.f0.9999.w500.kdx"
+  merge_tsv: "gff/utrome.e5.t1000.gc39.pas3.f0.9999.w500.m200.tsv"
+  tx_annots: null
+  gene_annots: null
+
+utrome_hg38_e10_t100:
+  path: "/data/mayrc/data/hcl/"
+  genome: "hg38"
+  gtf: "gff/utrome.e10.t100.gc39.pas3.f0.9999.w500.gtf"
+  kdx: "kdx/utrome.e10.t100.gc39.pas3.f0.9999.w500.kdx"
+  merge_tsv: "gff/utrome.e10.t100.gc39.pas3.f0.9999.w500.m200.tsv"
+  tx_annots: null
+  gene_annots: null
