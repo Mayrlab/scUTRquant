@@ -9,3 +9,4 @@ dependencies:
   - r-cowplot=1.1
   - bioconductor-singlecellexperiment=1.10
   - bioconductor-plyranges=1.8
+  - openssl=1
