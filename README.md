@@ -86,7 +86,7 @@ This configuration requires installing:
 2. Download the UTRome annotation, kallisto index, and merge file.
     ```
     cd scUTRquant/extdata/targets/utrome_mm10_v1
-    . download_utrome.sh
+    sh download_utrome.sh
     ```
     **Reuse Tip:** For use across multiple projects, it is recommended to centralize 
     these files and change the entries in the `configfile` for `utrome_gtf`,
@@ -96,7 +96,7 @@ This configuration requires installing:
 3. (Optional) Download the barcode whitelists.
     ```
     cd scUTRquant/extdata/bxs
-    . download_10X_whitelists.sh
+    sh download_10X_whitelists.sh
     ```
     **Reuse Tip:** Similar to the UTRome files, these can also be centralized
     and referenced by the `bx_whitelist` variable in the `configfile`.
@@ -115,7 +115,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 1. Download the raw data.
     ```
     cd scUTRquant/examples/neuron_1k_v3_bam/
-    . download.sh
+    sh download.sh
     ```
 
 2. Run the pipeline.
@@ -137,7 +137,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 1. Download the raw data.
     ```
     cd scUTRquant/examples/heart_1k_v3_fastq/
-    . download.sh
+    sh download.sh
     ```
 
 2. Run the pipeline.
