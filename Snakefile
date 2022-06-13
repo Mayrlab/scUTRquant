@@ -212,7 +212,7 @@ rule report_umis_per_cell:
         min_umis=config['min_umis']
     output:
         "qc/umi_count/{target}/{sample_id}.umi_count.html"
-    conda: "envs/bioconductor-sce.yaml"
+    conda: "envs/rmd-reporting.yaml"
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
 

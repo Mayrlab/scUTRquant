@@ -1,8 +1,10 @@
 #!/usr/bin/env Rscript
 
 library(magrittr)
+library(dplyr)
+library(readr)
+library(stringr)
 library(plyranges)
-library(tidyverse)
 library(Matrix)
 library(SingleCellExperiment)
 
