@@ -1,0 +1,2 @@
+sample_id,file_type,files
+pbmc_1k_v2_fastq,fastq,examples/pbmc_1k_v2_fastq/fastq/pbmc_1k_v2_S1_L001_R1_001.fastq.gz;examples/pbmc_1k_v2_fastq/fastq/pbmc_1k_v2_S1_L001_R2_001.fastq.gz;examples/pbmc_1k_v2_fastq/fastq/pbmc_1k_v2_S1_L002_R1_001.fastq.gz;examples/pbmc_1k_v2_fastq/fastq/pbmc_1k_v2_S1_L002_R2_001.fastq.gz

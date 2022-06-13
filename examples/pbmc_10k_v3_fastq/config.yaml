@@ -1,0 +1,10 @@
+dataset_name: "pbmc_10k_v3_fastq"
+sample_file: "examples/pbmc_10k_v3_fastq/sample_sheet.csv"
+cell_annots: "examples/pbmc_10k_v3_fastq/annots.csv"
+target: "utrome_hg38_v1"
+
+bx_whitelist: "extdata/bxs/3M-february-2018.txt"
+tech: "10xv3"
+strand: "--fr-stranded"
+
+min_umis: 1000
