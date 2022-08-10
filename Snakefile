@@ -108,11 +108,11 @@ rule bustools_whitelist:
         """
 
 def get_whitelist(wildcards):
-    if config['bx_whitelist'] == "":
-        return "data/kallisto/%s/whitelist.txt" % wildcards.sample_id
+    if not config['bx_whitelist']:
+        return "data/kallisto/%s/%s/whitelist.txt" % (wildcards.target, wildcards.sample_id)
     else:
         return config['bx_whitelist']
-    
+
 rule bustools_correct:
     input:
         bus="data/kallisto/{target}/{sample_id}/output.sorted.bus",
