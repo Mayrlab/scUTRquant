@@ -16,15 +16,16 @@ title: `r title_str`
 ---
 
 # Libraries
-```{r message=FALSE, warning=FALSE}
+```{r libs, message=FALSE, warning=FALSE}
 library(Matrix)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
 library(magrittr)
-library(cowplot)
 ```
 
 # Load Data
-```{r}
+```{r load_data}
 cts <- readMM(snakemake@input$mtx) %>%
   as("CsparseMatrix") %>%
   `dimnames<-`(list(
@@ -37,9 +38,9 @@ cts <- readMM(snakemake@input$mtx) %>%
 
 # Plot UMI Count Distribution
 
-Here we plot the empirical distribution of UMI counts per cell and include as reference the reported number of cells passing QC. Consistency with published data predicts that the distribution should exhibit a steep decline near the reported number.
+Here we plot the empirical distribution of UMI counts per cell barcode and indicate the specified minimum UMI count (`r snakemake@params$min_umis`) in blue.
 
-```{r}
+```{r plt_umis_by_barcode}
 colSums(cts) %>%
   sort(decreasing=TRUE) %>%
   { tibble(x=seq_along(.), y=.) } %>%
@@ -47,15 +48,30 @@ colSums(cts) %>%
   geom_line() +
   geom_hline(yintercept=as.integer(snakemake@params$min_umis),
 	     color='blue', linetype='dashed') +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x="Cell", y="UMI Count", title=snakemake@wildcards$sample_id) +
-  theme_cowplot()
+  scale_x_log10(expand=c(0,0,0.05,0)) +
+  scale_y_log10(expand=c(0,0,0.05,0)) +
+  labs(x="Cell Barcode Rank", y="UMI Count", title=snakemake@wildcards$sample_id) +
+  theme_bw()
 ```
 
 ---
 
-# Session Info
-```{r echo=FALSE}
+# Runtime Details
+## Session Info
+```{r sesh_info, echo=FALSE}
 sessionInfo()
+```
+
+## Conda Environment
+```{bash comment="", echo=FALSE}
+if ! command -v conda &> /dev/null
+then
+  echo "Conda not detected."
+elif [ -z "${CONDA_PREFIX}" ]
+then
+  echo "No active Conda environment."
+else
+  echo "## Conda Environment YAML"
+  conda env export
+fi
 ```

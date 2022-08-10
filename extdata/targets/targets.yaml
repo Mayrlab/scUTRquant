@@ -6,15 +6,35 @@ utrome_mm10_v1:
   merge_tsv: "adult.utrome.e3.t200.f0.999.w500.merge.tsv"
   tx_annots: "utrome_txs_annotation.Rds"
   gene_annots: "utrome_genes_annotation.Rds"
-  
-gencode_vM21_w500:
-  path: "extdata/targets/gencode_vM21_w500/"
+
+utrome_mm10_v2:
+  path: "extdata/targets/utrome_mm10_v2/"
   genome: "mm10"
-  gtf: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.gtf"
-  kdx: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.kdx"
-  merge_tsv: "gencode.vM21.annotation.mRNA_ends_found.txcutr.w500.merge.tsv"
+  gtf: "utrome.e30.t5.gc25.pas3.f0.9999.w500.gtf"
+  kdx: "utrome.e30.t5.gc25.pas3.f0.9999.w500.kdx"
+  merge_tsv: "utrome.e30.t5.gc25.pas3.f0.9999.w500.m200.tsv"
   tx_annots: null
   gene_annots: null
+
+utrome_hg38_v1:
+  path: "extdata/targets/utrome_hg38_v1/"
+  genome: "hg38"
+  gtf: "utrome.e30.t5.gc39.pas3.f0.9999.w500.gtf"
+  kdx: "utrome.e30.t5.gc39.pas3.f0.9999.w500.kdx"
+  merge_tsv: "utrome.e30.t5.gc39.pas3.f0.9999.w500.m200.tsv"
+  tx_annots: null
+  gene_annots: null
+
+## example custom target using GENCODE
+## see https://github.com/Mayrlab/txcutr-db
+# gencode_v38_pc_w500:
+#   path: "extdata/targets/gencode_v38_pc_w500/"
+#   genome: "hg38"
+#   gtf: "gencode.v38.annotation.pc.txcutr.w500.gtf"
+#   kdx: "gencode.v38.annotation.pc.txcutr.w500.kdx"
+#   merge_tsv: "gencode.v38.annotation.pc.txcutr.w500.merge.tsv"
+#   tx_annots: null
+#   gene_annots: null
 
 utrome_mm10_v1_unfiltered:
   path: "extdata/targets/utrome_mm10_v1_unfiltered/"  # files should be relative to this
