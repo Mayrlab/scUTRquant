@@ -10,42 +10,49 @@ library(Matrix)
 library(SingleCellExperiment)
 
 ################################################################################
-                                        # Fake Data (Interactive Testing)
+# Fake Data (Interactive Testing)
 ################################################################################
 
 if (interactive()) {
     Snakemake <- setClass("Snakemake", slots=c(input='list', output='list', params='list'))
     snakemake <- Snakemake(
         input=list(
-            bxs=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.barcodes.txt"),
-            genes=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.genes.txt"),
-            mtxs=c("data/kallisto/neuron_1k_v2_fastq/utrome.genes.mtx"),
-            gtf="extdata/gff/adult.utrome.e3.t200.f0.999.w500.gtf",
-            gene_annots="extdata/atlas/utrome_genes_annotation.Rds"),
-        output=list(sce="data/sce/test.utrome.genes.Rds"),
-        params=list(genome='mm10',
-                    sample_ids=c("neuron_1k_v2_fastq"),
+            bxs=c("data/kallisto/utrome_hg38_v1/pbmc_1k_v2_fastq/genes.barcodes.txt"),
+            genes=c("data/kallisto/utrome_hg38_v1/pbmc_1k_v2_fastq/genes.genes.txt"),
+            mtxs=c("data/kallisto/utrome_hg38_v1/pbmc_1k_v2_fastq/genes.mtx"),
+            gtf="extdata/targets/utrome_hg38_v1/utrome.e30.t5.gc39.pas3.f0.9999.w500.gtf",
+            gene_annots=NULL),
+        output=list(sce="data/sce/utrome_hg38_1/test.utrome.genes.Rds"),
+        params=list(genome='hg38',
+                    sample_ids=c("pbmc_1k_v2_fastq"),
                     min_umis="500",
-                    cell_annots="examples/neuron_1k_v2_fastq/annots.csv"))
+                    cell_annots="examples/pbmc_1k_v2_fastq/annots.csv"))
 }
 
 ################################################################################
-                                        # Load Data
+# Helper Functions
 ################################################################################
-
-## Row Annotations (UTRs)
-has_row_annots <- !is.null(snakemake@input$gene_annots)
-if (has_row_annots) {
-    df_gene_annots <- readRDS(snakemake@input$gene_annots)
+is_na_all <- function (v) { all(is.na(v)) }
+drop_na_mcols <- function (gr) {
+    cols_to_rm <- mcols(gr) %>%
+        apply(2, is_na_all) %>%
+        which %>% names
+    select(gr, -cols_to_rm)
 }
 
-## Row Ranges (
-gr_genes <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
-                    col_names=c('type', 'transcript_id', 'gene_id')) %>%
+################################################################################
+# Load Data
+################################################################################
 
-    ## keep only transcripts
+gr_gtf <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
+                   col_names=c('type', 'transcript_id', 'gene_id',
+                               'gene_name', 'transcript_name', 'utr_name', 'utr_rank'))
+grl_genes <- gr_gtf %>%
     filter(type == 'transcript') %>%
-    select(-c('type')) %>%
+
+    ## remove unneeded or missing columns
+    select(-c('type', 'gene_name')) %>%
+    drop_na_mcols %>%
 
     ## add rownames
     `names<-`(.$transcript_id) %>%
@@ -53,12 +60,34 @@ gr_genes <- read_gff(snakemake@input$gtf, genome_info=snakemake@params$genome,
     ## group by gene_id
     split(.$gene_id)
 
+## Row Annotations (UTRs)
+has_row_annots <- !is.null(snakemake@input$gene_annots)
+if (has_row_annots) {
+    df_gene_annots <- readRDS(snakemake@input$gene_annots)
+} else {
+    df_gene_annots <- gr_gtf %>%
+
+        ## keep only transcripts
+        filter(type == 'gene') %>%
+
+        ## remove unneeded or missing columns
+        select(-c('type', 'transcript_id', 'transcript_name', 'utr_name', 'utr_rank')) %>%
+        drop_na_mcols %>%
+
+        ## add rownames
+        `names<-`(.$gene_id) %>%
+
+        mcols() %>%
+
+        unique()
+}
+
 ## Column Annotations
 df_cell_annots <- snakemake@params$cell_annots %>% {
     if (is.null(.)) {
         tibble(cell_id=character(0))
     } else {
-        read_csv(.) 
+        read_csv(.)
     }
 }
 
@@ -86,7 +115,7 @@ sce <- mapply(load_mtx_to_sce,
     do.call(what=cbind)
 
 ################################################################################
-                                        # Attach Annotations
+# Attach Annotations
 ################################################################################
 
 colData(sce) %<>%
@@ -96,23 +125,13 @@ colData(sce) %<>%
     DataFrame %>%
     `[`(colnames(sce),)
 
-
-## TODO: Change merge table to use gene_id upstream
-## switch to gene_id instead of gene_symbol
-if (has_row_annots) {
-    sym2id <- df_gene_annots[,c("gene_symbol", "gene_id")] %>% deframe()
-    rownames(sce) <- sym2id[rownames(sce)]
-}
-
 ## attach location info
-rowRanges(sce) <- gr_genes[rownames(sce), ]
+rowRanges(sce) <- grl_genes[rownames(sce), ]
 
-if (has_row_annots) {
-    rowData(sce) <- df_gene_annots[rownames(sce), ]
-}
+rowData(sce) <- df_gene_annots[rownames(sce), ]
 
 ################################################################################
-                                        # Export SCE
+# Export SCE
 ################################################################################
 
 saveRDS(sce, snakemake@output$sce)
