@@ -20,12 +20,13 @@ if (interactive()) {
             txs=c("data/kallisto/utrome_hg38_v1/pbmc_1k_v2_fastq/txs.genes.txt"),
             mtxs=c("data/kallisto/utrome_hg38_v1/pbmc_1k_v2_fastq/txs.mtx"),
             gtf="extdata/targets/utrome_hg38_v1/utrome.e30.t5.gc39.pas3.f0.9999.w500.gtf",
-            tx_annots=NULL),
+            tx_annots=NULL,
+            cell_annots="examples/pbmc_1k_v2_fastq/annots.csv"),
         output=list(sce="data/sce/utrome_hg38_1/test.utrome.txs.Rds"),
         params=list(genome='hg38',
                     sample_ids=c("pbmc_1k_v2_fastq"),
                     min_umis="500",
-                    cell_annots="examples/pbmc_1k_v2_fastq/annots.csv"))
+                    cell_annots_key="cell_id"))
 }
 
 ################################################################################
@@ -84,9 +85,9 @@ if (has_row_annots) {
 }
 
 ## Column Annotations
-df_cell_annots <- snakemake@params$cell_annots %>% {
+df_cell_annots <- snakemake@input$cell_annots %>% {
     if (is.null(.)) {
-        tibble(cell_id=character(0))
+        tibble(!!(snakemake@params$cell_annots_key):=character(0))
     } else {
         read_csv(.)
     }
@@ -104,7 +105,9 @@ load_mtx_to_sce <- function (mtxFile, bxFile, txFile, sample_id) {
         t %>%
         { .[, colSums(.) >= as.integer(snakemake@params$min_umis)] } %>%
         { SingleCellExperiment(assays=list(counts=.),
-                               colData=DataFrame(cell_id=colnames(.), sample_id=sample_id, row.names=colnames(.))) }
+                               colData=DataFrame(cell_id=colnames(.),
+                                                 sample_id=sample_id,
+                                                 row.names=colnames(.))) }
 }
 
 
@@ -121,7 +124,7 @@ sce <- mapply(load_mtx_to_sce,
 
 colData(sce) %<>%
     as_tibble %>%
-    left_join(df_cell_annots, by='cell_id') %>%
+    left_join(df_cell_annots, by=c("cell_id"=snakemake@params$cell_annots_key)) %>%
     set_rownames(.$cell_id) %>%
     DataFrame %>%
     `[`(colnames(sce),)

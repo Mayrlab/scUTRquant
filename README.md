@@ -123,7 +123,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 ## 1K Neurons (10xv3) - BAM
 
 1. Download the raw data.
-    ```
+    ```bash
     cd scUTRquant/examples/neuron_1k_v3_bam/
     sh download.sh
     ```
@@ -131,39 +131,54 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 2. Run the pipeline.
 
    **Conda Mode**
-    ```
+    ```bash
     cd scUTRquant
     snakemake --use-conda --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
 
    **Singularity Mode**
-    ```
+    ```bash
     cd scutr-quant
     snakemake --use-singularity --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
+    
+3. Output `SingleCellExperiment` objects can be loaded with `readRDS` in R:
 
-## 1K Heart (10xv3) - FASTQ
+   **R Session**
+    ```r
+    > sce_txs <- readRDS("data/sce/utrome_mm10_v1/neuron_1k_v3_bam.txs.Rds")
+    > sce_genes <- readRDS("data/sce/utrome_mm10_v1/neuron_1k_v3_bam.genes.Rds")
+    ```
+
+## 1K PBMCs (10xv3) - FASTQ
 
 1. Download the raw data.
-    ```
-    cd scUTRquant/examples/heart_1k_v3_fastq/
+    ```bash
+    cd scUTRquant/examples/pbmc_1k_v3_fastq/
     sh download.sh
     ```
 
 2. Run the pipeline.
 
    **Conda Mode**
-    ```
+    ```bash
     cd scUTRquant
-    snakemake --use-conda --configfile examples/heart_1k_v3_fastq/config.yaml
+    snakemake --use-conda --configfile examples/pbmc_1k_v3_fastq/config.yaml
     ```
 
    **Singularity Mode**
-    ```
+    ```bash
     cd scUTRquant
-    snakemake --use-singularity --configfile examples/heart_1k_v3_fastq/config.yaml
+    snakemake --use-singularity --configfile examples/pbmc_1k_v3_fastq/config.yaml
     ```
 
+3. Output `SingleCellExperiment` objects can be loaded with `readRDS` in R:
+
+   **R Session**
+    ```r
+    > sce_txs <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.txs.Rds")
+    > sce_genes <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.genes.Rds")
+    ```
 
 # File Specifications
 ## Configuration File
@@ -187,7 +202,8 @@ pipeline. The following keys are expected:
      transcripts when opposing stranded genes overlap
  - `bx_whitelist`: file of valid barcodes used in `bustools correct`
  - `min_umis`: minimum number of UMIs per cell; cells below this threshold are excluded
- - `cell_annots`: (optional) CSV file with a `cell_id` entry that matches thee `<sample_id>_<cell_bx>` format
+ - `cell_annots`: (optional) CSV file with a key column that matches the `<sample_id>_<cell_bx>` format
+ - `cell_annots_key`: specifies the name of the key column in the `cell_annots` file; default is `cell_id`
  
 ### Default Values
 
