@@ -1,6 +1,7 @@
 dataset_name: "heart_1k_v2_fastq"
 sample_file: "examples/heart_1k_v2_fastq/sample_sheet.csv"
 cell_annots: "examples/heart_1k_v2_fastq/annots.csv"
+target: "utrome_mm10_v2"
 
 bx_whitelist: "extdata/bxs/737K-august-2016.txt"
 tech: "10xv2"

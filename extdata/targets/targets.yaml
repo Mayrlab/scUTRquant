@@ -7,6 +7,15 @@ utrome_mm10_v1:
   tx_annots: "utrome_txs_annotation.Rds"
   gene_annots: "utrome_genes_annotation.Rds"
 
+utrome_mm10_v2:
+  path: "extdata/targets/utrome_mm10_v2/"
+  genome: "mm10"
+  gtf: "utrome.e30.t5.gc25.pas3.f0.9999.w500.gtf"
+  kdx: "utrome.e30.t5.gc25.pas3.f0.9999.w500.kdx"
+  merge_tsv: "utrome.e30.t5.gc25.pas3.f0.9999.w500.m200.tsv"
+  tx_annots: null
+  gene_annots: null
+
 utrome_hg38_v1:
   path: "extdata/targets/utrome_hg38_v1/"
   genome: "hg38"
