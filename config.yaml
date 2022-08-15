@@ -2,7 +2,7 @@ dataset_name: "output"
 sample_regex: ".*"
 cell_annots: null
 cell_annots_key: "cell_id"
-target: "utrome_mm10_v1"
+target: "utrome_mm10_v2"
 output_type:
   - "txs"
   - "genes"
