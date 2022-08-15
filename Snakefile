@@ -225,14 +225,15 @@ rule mtxs_to_sce_txs:
         mtxs=expand("data/kallisto/{target}/{sample_id}/txs.mtx",
                     sample_id=samples.index.values, allow_missing=True),
         gtf=get_target_file('gtf'),
-        tx_annots=get_target_file('tx_annots')
+        tx_annots=get_target_file('tx_annots'),
+        cell_annots=config['cell_annots']
     output:
         sce="data/sce/{target}/%s.txs.Rds" % config['dataset_name']
     params:
         genome=lambda wcs: targets[wcs.target]['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
-        cell_annots=config['cell_annots']
+        cell_annots_key=config['cell_annots_key']
     resources:
         mem_mb=16000
     conda: "envs/bioconductor-sce.yaml"
@@ -248,14 +249,15 @@ rule mtxs_to_sce_genes:
         mtxs=expand("data/kallisto/{target}/{sample_id}/genes.mtx",
                     sample_id=samples.index.values, allow_missing=True),
         gtf=get_target_file('gtf'),
-        gene_annots=get_target_file('gene_annots')
+        gene_annots=get_target_file('gene_annots'),
+        cell_annots=config['cell_annots']
     output:
         sce="data/sce/{target}/%s.genes.Rds" % config['dataset_name']
     params:
         genome=lambda wcs: targets[wcs.target]['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
-        cell_annots=config['cell_annots']
+        cell_annots_key=config['cell_annots_key']
     resources:
         mem_mb=16000
     conda: "envs/bioconductor-sce.yaml"
