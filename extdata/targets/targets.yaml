@@ -13,8 +13,8 @@ utrome_mm10_v2:
   gtf: "utrome.e30.t5.gc25.pas3.f0.9999.w500.gtf"
   kdx: "utrome.e30.t5.gc25.pas3.f0.9999.w500.kdx"
   merge_tsv: "utrome.e30.t5.gc25.pas3.f0.9999.w500.m200.tsv"
-  tx_annots: null
-  gene_annots: null
+  tx_annots: "utrome_txs_annotation.Rds"
+  gene_annots: "utrome_genes_annotation.Rds"
 
 utrome_hg38_v1:
   path: "extdata/targets/utrome_hg38_v1/"
@@ -22,8 +22,8 @@ utrome_hg38_v1:
   gtf: "utrome.e30.t5.gc39.pas3.f0.9999.w500.gtf"
   kdx: "utrome.e30.t5.gc39.pas3.f0.9999.w500.kdx"
   merge_tsv: "utrome.e30.t5.gc39.pas3.f0.9999.w500.m200.tsv"
-  tx_annots: null
-  gene_annots: null
+  tx_annots: "utrome_txs_annotation.Rds"
+  gene_annots: "utrome_genes_annotation.Rds"
 
 ## example custom target using GENCODE
 ## see https://github.com/Mayrlab/txcutr-db
