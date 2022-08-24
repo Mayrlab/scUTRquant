@@ -36,6 +36,10 @@ message("[INFO] Loading sample data...")
 samples = pd.read_csv(config['sample_file'], index_col='sample_id')
 message("[INFO] Loaded %d samples." % len(samples.index))
 
+# conform cell_annots for input
+if config['cell_annots'] is None:
+    config['cell_annots'] = []
+
 wildcard_constraints:
     sample_id=config['sample_regex']
 
