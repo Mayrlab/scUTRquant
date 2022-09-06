@@ -11,3 +11,5 @@ bx_whitelist: null
 correct_bus: True
 min_umis: 500
 targets_config: "extdata/targets/targets.yaml"
+use_hdf5: False
+include_reports: True
