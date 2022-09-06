@@ -43,16 +43,28 @@ if config['cell_annots'] is None:
 wildcard_constraints:
     sample_id=config['sample_regex']
 
+# get list of expected outputs
+def get_outputs():
+    outputs = []
+    if config['include_reports']:
+        outputs += expand("qc/umi_count/{target}/{sample_id}.umi_count.html",
+                          target=target_list,
+                          sample_id=samples.index.values)
+    if config['use_hdf5']:
+        outputs += expand("data/sce/{target}/{dataset}.{output_type}.{file_type}",
+                          target=target_list,
+                          dataset=config['dataset_name'],
+                          output_type=config['output_type'],
+                          file_type=['se.rds', 'assays.h5'])
+    else:
+        outputs += expand("data/sce/{target}/{dataset}.{output_type}.Rds",
+                          target=target_list,
+                          dataset=config['dataset_name'],
+                          output_type=config['output_type'])
+    return outputs
     
 rule all:
-    input:
-        expand("data/sce/{target}/{dataset}.{output_type}.Rds",
-               target=target_list,
-               dataset=config['dataset_name'],
-               output_type=config['output_type']),
-        expand("qc/umi_count/{target}/{sample_id}.umi_count.html",
-               target=target_list,
-               sample_id=samples.index.values)
+    input: get_outputs()
 
 def get_file_type(wildcards):
     return "--bam" if samples.file_type[wildcards.sample_id] == 'bam' else ""
@@ -237,7 +249,9 @@ rule mtxs_to_sce_txs:
         genome=lambda wcs: targets[wcs.target]['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
-        cell_annots_key=config['cell_annots_key']
+        cell_annots_key=config['cell_annots_key'],
+        tmp_dir=config['tmp_dir'],
+        use_hdf5=False
     resources:
         mem_mb=16000
     conda: "envs/bioconductor-sce.yaml"
@@ -261,7 +275,63 @@ rule mtxs_to_sce_genes:
         genome=lambda wcs: targets[wcs.target]['genome'],
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
-        cell_annots_key=config['cell_annots_key']
+        cell_annots_key=config['cell_annots_key'],
+        tmp_dir=config['tmp_dir'],
+        use_hdf5=False
+    resources:
+        mem_mb=16000
+    conda: "envs/bioconductor-sce.yaml"
+    script:
+        "scripts/mtxs_to_sce_genes.R"
+
+rule mtxs_to_sce_h5_txs:
+    input:
+        bxs=expand("data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        txs=expand("data/kallisto/{target}/{sample_id}/txs.genes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/txs.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        tx_annots=get_target_file('tx_annots'),
+        cell_annots=config['cell_annots']
+    output:
+        sce="data/sce/{target}/%s.txs.se.rds" % config['dataset_name'],
+        h5="data/sce/{target}/%s.txs.assays.h5" % config['dataset_name']
+    params:
+        genome=lambda wcs: targets[wcs.target]['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        cell_annots_key=config['cell_annots_key'],
+        tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-txs-" + wcs.target + "-" + config['dataset_name'],
+        use_hdf5=True
+    resources:
+        mem_mb=16000
+    conda: "envs/bioconductor-sce.yaml"
+    script:
+        "scripts/mtxs_to_sce_txs.R"
+
+rule mtxs_to_sce_h5_genes:
+    input:
+        bxs=expand("data/kallisto/{target}/{sample_id}/genes.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        genes=expand("data/kallisto/{target}/{sample_id}/genes.genes.txt",
+                     sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/genes.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        gene_annots=get_target_file('gene_annots'),
+        cell_annots=config['cell_annots']
+    output:
+        sce="data/sce/{target}/%s.genes.se.rds" % config['dataset_name'],
+        h5="data/sce/{target}/%s.genes.assays.h5" % config['dataset_name']
+    params:
+        genome=lambda wcs: targets[wcs.target]['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        cell_annots_key=config['cell_annots_key'],
+        tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-genes-" + wcs.target + "-" + config['dataset_name'],
+        use_hdf5=True
     resources:
         mem_mb=16000
     conda: "envs/bioconductor-sce.yaml"
