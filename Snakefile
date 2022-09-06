@@ -306,7 +306,8 @@ rule mtxs_to_sce_h5_txs:
         tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-txs-" + wcs.target + "-" + config['dataset_name'],
         use_hdf5=True
     resources:
-        mem_mb=16000
+        mem_mb=8000
+    threads: 8
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_txs.R"
@@ -333,7 +334,8 @@ rule mtxs_to_sce_h5_genes:
         tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-genes-" + wcs.target + "-" + config['dataset_name'],
         use_hdf5=True
     resources:
-        mem_mb=16000
+        mem_mb=8000
+    threads: 8
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
