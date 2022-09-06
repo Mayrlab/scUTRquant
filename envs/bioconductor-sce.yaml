@@ -4,11 +4,12 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - r-base=4.0
+  - r-base=4.1
   - r-dplyr=1.0
   - r-ggplot2=3.3
   - r-readr=2.1
   - r-stringr=1.4
-  - bioconductor-singlecellexperiment=1.10
-  - bioconductor-plyranges=1.8
+  - bioconductor-hdf5array=1.22
+  - bioconductor-singlecellexperiment=1.16
+  - bioconductor-plyranges=1.14
   - openssl=1
