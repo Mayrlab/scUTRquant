@@ -8,13 +8,15 @@ library(plyranges)
 library(Matrix)
 library(HDF5Array)
 library(SingleCellExperiment)
+library(BiocParallel)
 
 ################################################################################
 # Fake Data (Interactive Testing)
 ################################################################################
 
 if (interactive()) {
-    Snakemake <- setClass("Snakemake", slots=c(input='list', output='list', params='list'))
+    Snakemake <- setClass("Snakemake", slots=c(input='list', output='list',
+                                               params='list', threads='numeric'))
     snakemake <- Snakemake(
         input=list(
             bxs=c("data/kallisto/utrome_hg38_v1/pbmc_1k_v2_fastq/txs.barcodes.txt",
@@ -32,8 +34,9 @@ if (interactive()) {
                     sample_ids=c("pbmc_1k_v2_fastq_1", "pbmc_1k_v2_fastq_2"),
                     min_umis="500",
                     cell_annots_key="cell_id",
-                    tmp_dir=tempdir(),
-                    use_hdf5=TRUE))
+                    tmp_dir=tempdir(check=TRUE),
+                    use_hdf5=TRUE),
+        threads=4L)
 }
 
 ################################################################################
@@ -127,12 +130,13 @@ load_mtx_to_sce <- function (mtxFile, bxFile, txFile, sample_id) {
                                                  row.names=colnames(.))) }
 }
 
+register(MulticoreParam(snakemake@threads))
 
-sce <- mapply(load_mtx_to_sce,
-              mtxFile=snakemake@input$mtxs,
-              bxFile=snakemake@input$bxs,
-              txFile=snakemake@input$txs,
-              sample_id=snakemake@params$sample_ids) %>%
+sce <- bpmapply(load_mtx_to_sce,
+                mtxFile=snakemake@input$mtxs,
+                bxFile=snakemake@input$bxs,
+                txFile=snakemake@input$txs,
+                sample_id=snakemake@params$sample_ids) %>%
     do.call(what=cbind)
 
 ################################################################################
@@ -155,9 +159,10 @@ rowData(sce) <- df_tx_annots[rownames(sce), ]
 ################################################################################
 
 if (snakemake@params$use_hdf5) {
+    chunkdim <- c(dim(sce)[[1]], min(1e3L, dim(sce)[[2]]))
     saveHDF5SummarizedExperiment(sce, dir=dirname(snakemake@output$sce),
                                  prefix=str_remove(basename(snakemake@output$sce), "se.rds$"),
-                                 as.sparse=TRUE, verbose=TRUE)
+                                 chunkdim=chunkdim, as.sparse=TRUE, verbose=TRUE)
     unlink(snakemake@params$tmp_dir, recursive=TRUE, force=TRUE)
 } else {
     saveRDS(sce, snakemake@output$sce)
