@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/301531578.svg)](https://zenodo.org/badge/latestdoi/301531578)
+
+
 # scUTRquant
 A bioinformatics pipeline for single-cell 3' UTR isoform quantification.
 
