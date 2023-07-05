@@ -295,7 +295,8 @@ snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config
 
 # Citation
 
-Fansler, M. M., Zhen, G., & Mayr, C. (2021). Quantification of alternative 3′UTR isoforms from single cell RNA-seq data with scUTRquant. *BioRxiv*, 2021.11.22.469635. https://doi.org/10.1101/2021.11.22.469635
+Fansler, M. M., Mitschka, S., & Mayr, C. (2023). Comprehensive annotation of 3′UTRs from primary cells and their quantification from scRNA-seq data.
+*bioRxiv*, 2021.11.22.469635. https://doi.org/10.1101/2021.11.22.469635
 
 
 <!-- References -->
