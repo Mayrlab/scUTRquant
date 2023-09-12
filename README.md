@@ -59,6 +59,12 @@ generation.
 
 ## Requirements
 The pipeline can use either Conda/Mamba or Singularity to provide the required software.
+All software versions are defined in [the Conda YAML files](https://github.com/Mayrlab/scUTRquant/tree/main/envs).
+
+### OS Requirements
+The software has been tested on MacOS (11-13) and Linux (Ubuntu 20,22; CentOS 7). Windows
+is not directly supported, but WSL2 should work. The [scUTRquant-demo](https://github.com/mfansler/scUTRquant-demo)
+repository directly tests running examples on the GitHub-hosted runners.
 
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
@@ -113,6 +119,8 @@ This configuration requires installing:
     ```
     **Reuse Tip:** Similar to the UTRome files, these can also be centralized
     and referenced by the `bx_whitelist` variable in the `configfile`.
+
+For GitHub runners, it takes ~ 3 mins to clone and download the scUTRquant files.
 
 # Running Examples
 Examples are provided in the `scUTRquant/examples` folder. Each includes a script
@@ -182,6 +190,10 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
     > sce_txs <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.txs.Rds")
     > sce_genes <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.genes.Rds")
     ```
+
+On GitHub runners with 2-3 cores, these examples have typical execution times of 5-10 mins. 
+On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
+can process in under an hour when properly configured.
 
 # File Specifications
 ## Configuration File
