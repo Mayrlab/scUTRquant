@@ -35,6 +35,7 @@ if (interactive()) {
                     sample_ids=c("pbmc_1k_v2_fastq_1", "pbmc_1k_v2_fastq_2"),
                     min_umis="500",
                     cell_annots_key="cell_id",
+                    exclude_unannotated_cells=FALSE,
                     tmp_dir=tempdir(check=TRUE),
                     use_hdf5=TRUE),
         threads=4L)
@@ -52,13 +53,15 @@ drop_na_mcols <- function (gr) {
     select(gr, -cols_to_rm)
 }
 
+filter_min_umis <- function (x) {
+    x[, colSums(x) >= as.integer(snakemake@params$min_umis)]
+}
+
 optional_hdf5_convert <- if (snakemake@params$use_hdf5) {
     dir.create(snakemake@params$tmp_dir, recursive=TRUE)
     setHDF5DumpDir(snakemake@params$tmp_dir)
     writeTENxMatrix
-} else {
-    identity
-}
+} else { identity }
 
 ################################################################################
 # Load Data
@@ -104,26 +107,30 @@ if (has_row_annots) {
 }
 
 ## Column Annotations
-df_cell_annots <- snakemake@input$cell_annots %>% {
-    if (is.null(.)) {
-        tibble(!!(snakemake@params$cell_annots_key):=character(0))
-    } else {
-        read_csv(.)
-    }
+has_cell_annots <- !is.null(snakemake@input$cell_annots)
+df_cell_annots <- if (has_cell_annots) {
+    read_csv(snakemake@input$cell_annots)
+} else {
+    tibble(!!(snakemake@params$cell_annots_key):=character(0))
 }
+
+optional_filter_unannotated <- if (has_cell_annots && snakemake@params$exclude_unannotated_cells) {
+    function (x) {
+        x[, colnames(x) %in% df_cell_annots[[snakemake@params$cell_annots_key]]]
+    }
+} else { identity }
 
 ## Load MTXs Function
 load_mtx_to_sce <- function (mtxFile, bxFile, geneFile, sample_id) {
-    ## TODO: Add annotation-based filtering
-    ## valid_cells <- filter(df_annots, sample_id == sample_id) %$% cell_id
     readMM(mtxFile) %>%
         as("CsparseMatrix") %>%
         `dimnames<-`(list(
             cell_id=str_c(sample_id, "_", read_lines(bxFile)),
             gene_id=read_lines(geneFile))) %>%
         t %>%
-        { .[, colSums(.) >= as.integer(snakemake@params$min_umis)] } %>%
-        optional_hdf5_convert() %>%
+        optional_filter_unannotated %>%
+        filter_min_umis %>%
+        optional_hdf5_convert %>%
         { SingleCellExperiment(assays=list(counts=.),
                                colData=DataFrame(cell_id=colnames(.),
                                                  sample_id=sample_id,

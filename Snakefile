@@ -250,6 +250,7 @@ rule mtxs_to_sce_txs:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=config['tmp_dir'],
         use_hdf5=False
     resources:
@@ -276,6 +277,7 @@ rule mtxs_to_sce_genes:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=config['tmp_dir'],
         use_hdf5=False
     resources:
@@ -303,6 +305,7 @@ rule mtxs_to_sce_h5_txs:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-txs-" + wcs.target + "-" + config['dataset_name'],
         use_hdf5=True
     resources:
@@ -331,6 +334,7 @@ rule mtxs_to_sce_h5_genes:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-genes-" + wcs.target + "-" + config['dataset_name'],
         use_hdf5=True
     resources:

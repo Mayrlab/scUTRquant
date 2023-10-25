@@ -219,6 +219,7 @@ pipeline. The following keys are expected:
  - `min_umis`: minimum number of UMIs per cell; cells below this threshold are excluded
  - `cell_annots`: (optional) CSV file with a key column that matches the `<sample_id>_<cell_bx>` format
  - `cell_annots_key`: specifies the name of the key column in the `cell_annots` file; default is `cell_id`
+ - `exclude_unannotated_cells`: boolean indicating whether unannotated cells should be excluded from the final output; default is `False`
  
 ### Default Values
 
