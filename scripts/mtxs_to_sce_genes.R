@@ -133,7 +133,7 @@ load_mtx_to_sce <- function (mtxFile, bxFile, geneFile, sample_id) {
         optional_hdf5_convert %>%
         { SingleCellExperiment(assays=list(counts=.),
                                colData=DataFrame(cell_id=colnames(.),
-                                                 sample_id=sample_id,
+                                                 sample_id.sq=sample_id,
                                                  row.names=colnames(.))) }
 }
 
