@@ -94,6 +94,13 @@ for target_id, target in targets.items():
             popd
             """
 
+## Import downloading rules for barcodes
+module bxs_workflow:
+    snakefile: "extdata/bxs/download.smk"
+
+use rule * from bxs_workflow
+
+## Convert merge data for tx output
 rule generate_tx_merge:
     input:
         tsv=get_target_file('merge_tsv')
@@ -104,6 +111,7 @@ rule generate_tx_merge:
         tail -n+2 {input.tsv} | cut -f1,2 > {output}
         """
 
+## Convert merge data for gene output
 rule generate_gene_merge:
     input:
         tsv=get_target_file('merge_tsv')
