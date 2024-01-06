@@ -1,10 +1,14 @@
 container: "docker://mfansler/scutr-quant:0.1.5"
 configfile: "config.yaml"
 
-from snakemake.io import load_configfile
-import pandas as pd
 import os
+import pandas as pd
+from snakemake.io import load_configfile
+from snakemake.utils import min_version
 from sys import stderr
+
+# set minimum Snakemake version
+min_version("6.0")
 
 # print to stderr
 def message(*args, **kwargs):
