@@ -69,7 +69,7 @@ repository directly tests running examples on the GitHub-hosted runners.
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
 
- - [Snakemake][ref:snakemake] >= 5.11<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
@@ -84,7 +84,7 @@ conda install -n base -c conda-forge mamba
 Snakemake can use the pre-built scUTRsquant Docker image to provide all additional software.
 This configuration requires installing:
 
- - [Snakemake][ref:snakemake] >= 5.11<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
@@ -96,7 +96,13 @@ This configuration requires installing:
     git clone git@github.com:Mayrlab/scUTRquant.git
     ```
 
-2. Download the UTRome annotation, kallisto index, and merge file.
+As of scUTRquant v0.4.0, that is all!
+
+<details>
+  
+> *The following steps of prepopulating the annotations and barcode whitelists are now handled directly in the pipeline.*
+  
+2. (**Deprecated**) Download the UTRome annotation, kallisto index, and merge file.
     **Human (hg38)**
     ```
     cd scUTRquant/extdata/targets/utrome_hg38_v1
@@ -112,7 +118,7 @@ This configuration requires installing:
     `utrome_kdx`, and `utrome_merge` to point to the central location. In that
     case, one does not need to redownload the files.
 
-3. (Optional) Download the barcode whitelists.
+3. (**Deprecated** and Optional) Download the barcode whitelists.
     ```
     cd scUTRquant/extdata/bxs
     sh download_10X_whitelists.sh
@@ -121,6 +127,7 @@ This configuration requires installing:
     and referenced by the `bx_whitelist` variable in the `configfile`.
 
 For GitHub runners, it takes ~ 3 mins to clone and download the scUTRquant files.
+</details>
 
 # Running Examples
 Examples are provided in the `scUTRquant/examples` folder. Each includes a script
