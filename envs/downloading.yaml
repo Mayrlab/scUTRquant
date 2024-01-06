@@ -1,0 +1,8 @@
+name: downloading
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - gzip
+  - tar
+  - wget
