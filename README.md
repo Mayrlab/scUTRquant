@@ -69,7 +69,7 @@ repository directly tests running examples on the GitHub-hosted runners.
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
 
- - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
@@ -84,7 +84,7 @@ conda install -n base -c conda-forge mamba
 Snakemake can use the pre-built scUTRsquant Docker image to provide all additional software.
 This configuration requires installing:
 
- - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
