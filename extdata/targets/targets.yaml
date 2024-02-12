@@ -99,6 +99,24 @@ gencode_v38_pc_w500:
   tx_annots: null
   gene_annots: null
 
+gencode_v39_pc_w500:
+  path: "extdata/targets/gencode_v39_pc_w500/"
+  genome: "hg38"
+  gtf: "gencode.v39.annotation.pc.txcutr.w500.gtf.gz"
+  kdx: "gencode.v39.annotation.pc.txcutr.w500.kdx"
+  merge_tsv: "gencode.v39.annotation.pc.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+
+gencode_vM25_pc_w500:
+  path: "extdata/targets/gencode_vM25_pc_w500/"
+  genome: "mm10"
+  gtf: "gencode.vM25.annotation.pc.txcutr.w500.gtf.gz"
+  kdx: "gencode.vM25.annotation.pc.txcutr.w500.kdx"
+  merge_tsv: "gencode.vM25.annotation.pc.txcutr.w500.merge.tsv"
+  tx_annots: null
+  gene_annots: null
+
 utrome_hg38_e20_t3:
   path: "/data/mayrc/data/hcl/"
   genome: "hg38"

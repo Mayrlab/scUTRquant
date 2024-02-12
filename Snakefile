@@ -253,7 +253,7 @@ rule mtxs_to_sce_txs:
         tmp_dir=config['tmp_dir'],
         use_hdf5=False
     resources:
-        mem_mb=16000
+        mem_mb=64000
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_txs.R"
@@ -279,7 +279,7 @@ rule mtxs_to_sce_genes:
         tmp_dir=config['tmp_dir'],
         use_hdf5=False
     resources:
-        mem_mb=16000
+        mem_mb=64000
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
@@ -307,7 +307,7 @@ rule mtxs_to_sce_h5_txs:
         use_hdf5=True
     resources:
         mem_mb=8000
-    threads: 8
+    threads: 12
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_txs.R"
@@ -335,7 +335,7 @@ rule mtxs_to_sce_h5_genes:
         use_hdf5=True
     resources:
         mem_mb=8000
-    threads: 8
+    threads: 12
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
