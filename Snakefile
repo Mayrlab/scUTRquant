@@ -1,10 +1,14 @@
 container: "docker://mfansler/scutr-quant:0.1.5"
 configfile: "config.yaml"
 
-from snakemake.io import load_configfile
-import pandas as pd
 import os
+import pandas as pd
+from snakemake.io import load_configfile
+from snakemake.utils import min_version
 from sys import stderr
+
+# set minimum Snakemake version
+min_version("6.0")
 
 # print to stderr
 def message(*args, **kwargs):
@@ -65,6 +69,66 @@ def get_outputs():
     
 rule all:
     input: get_outputs()
+
+################################################################################
+## Downloading and Preprocessing
+################################################################################
+
+## generate downloading rules for target files if a script is provided
+## NB: script should generate files *relative* to the script
+for target_id, target in targets.items():
+    if 'download_script' not in target or target['download_script'] is None:
+        continue
+
+    target_path = target['path']
+    download_script = target_path + target['download_script']
+    
+    FILE_KEYS = ['gtf', 'kdx', 'merge_tsv', 'tx_annots', 'gene_annots']
+    target_files = [target_path + target[k] for k in FILE_KEYS]
+
+    rule:
+        name: f"download_{target_id}"
+        input: f"{download_script}"
+        output: expand("{target_file}", target_file=target_files)
+        conda: "envs/downloading.yaml"
+        shell:
+            """
+            pushd $(dirname {input})
+            sh $(basename {input})
+            popd
+            """
+
+## Import downloading rules for barcodes
+module bxs_workflow:
+    snakefile: "extdata/bxs/download.smk"
+
+use rule * from bxs_workflow
+
+## Convert merge data for tx output
+rule generate_tx_merge:
+    input:
+        tsv=get_target_file('merge_tsv')
+    output:
+        "data/utrs/{target}/tx_merge.tsv"
+    shell:
+        """
+        tail -n+2 {input.tsv} | cut -f1,2 > {output}
+        """
+
+## Convert merge data for gene output
+rule generate_gene_merge:
+    input:
+        tsv=get_target_file('merge_tsv')
+    output:
+        "data/utrs/{target}/gene_merge.tsv"
+    shell:
+        """
+        tail -n+2 {input.tsv} | cut -f1,3 > {output}
+        """
+
+################################################################################
+## kallisto-bustools
+################################################################################
 
 def get_file_type(wildcards):
     return "--bam" if samples.file_type[wildcards.sample_id] == 'bam' else ""
@@ -157,26 +221,6 @@ rule bustools_correct_sort:
         bustools sort -t{threads} -T {params.tmpDir} -o {output} {input}
         """
 
-rule generate_tx_merge:
-    input:
-        tsv=get_target_file('merge_tsv')
-    output:
-        "data/utrs/{target}/tx_merge.tsv"
-    shell:
-        """
-        tail -n+2 {input.tsv} | cut -f1,2 > {output}
-        """
-
-rule generate_gene_merge:
-    input:
-        tsv=get_target_file('merge_tsv')
-    output:
-        "data/utrs/{target}/gene_merge.tsv"
-    shell:
-        """
-        tail -n+2 {input.tsv} | cut -f1,3 > {output}
-        """
-
 def get_input_busfile(wildcards):
     if config['correct_bus']:
         return "data/kallisto/%s/%s/output.corrected.sorted.bus" % (wildcards.target, wildcards.sample_id)
@@ -219,18 +263,9 @@ rule bustools_count_genes:
         bustools count -e {input.ec} -t {input.txs} -g {input.merge} -o $prefix --em --genecounts {input.bus}
         """
 
-rule report_umis_per_cell:
-    input:
-        bxs="data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
-        txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
-        mtx="data/kallisto/{target}/{sample_id}/txs.mtx"
-    params:
-        min_umis=config['min_umis']
-    output:
-        "qc/umi_count/{target}/{sample_id}.umi_count.html"
-    conda: "envs/rmd-reporting.yaml"
-    script:
-        "scripts/report_umi_counts_per_cell.Rmd"
+################################################################################
+## Outputs
+################################################################################
 
 rule mtxs_to_sce_txs:
     input:
@@ -250,6 +285,7 @@ rule mtxs_to_sce_txs:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=config['tmp_dir'],
         use_hdf5=False
     resources:
@@ -276,6 +312,7 @@ rule mtxs_to_sce_genes:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=config['tmp_dir'],
         use_hdf5=False
     resources:
@@ -303,6 +340,7 @@ rule mtxs_to_sce_h5_txs:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-txs-" + wcs.target + "-" + config['dataset_name'],
         use_hdf5=True
     resources:
@@ -331,6 +369,7 @@ rule mtxs_to_sce_h5_genes:
         sample_ids=samples.index.values,
         min_umis=config['min_umis'],
         cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells'],
         tmp_dir=lambda wcs: config['tmp_dir'] + "/sce-genes-" + wcs.target + "-" + config['dataset_name'],
         use_hdf5=True
     resources:
@@ -339,6 +378,29 @@ rule mtxs_to_sce_h5_genes:
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
+
+
+################################################################################
+## Reports
+################################################################################
+
+rule report_umis_per_cell:
+    input:
+        bxs="data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
+        txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
+        mtx="data/kallisto/{target}/{sample_id}/txs.mtx"
+    params:
+        min_umis=config['min_umis']
+    output:
+        "qc/umi_count/{target}/{sample_id}.umi_count.html"
+    conda: "envs/rmd-reporting.yaml"
+    script:
+        "scripts/report_umi_counts_per_cell.Rmd"
+
+
+################################################################################
+## Utils
+################################################################################
 
 rule count_ambiguities:
     input:

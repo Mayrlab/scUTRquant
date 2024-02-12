@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/301531578.svg)](https://zenodo.org/badge/latestdoi/301531578)
+
+
 # scUTRquant
 A bioinformatics pipeline for single-cell 3' UTR isoform quantification.
 
@@ -56,11 +59,17 @@ generation.
 
 ## Requirements
 The pipeline can use either Conda/Mamba or Singularity to provide the required software.
+All software versions are defined in [the Conda YAML files](https://github.com/Mayrlab/scUTRquant/tree/main/envs).
+
+### OS Requirements
+The software has been tested on MacOS (11-13) and Linux (Ubuntu 20,22; CentOS 7). Windows
+is not directly supported, but WSL2 should work. The [scUTRquant-demo](https://github.com/mfansler/scUTRquant-demo)
+repository directly tests running examples on the GitHub-hosted runners.
 
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
 
- - [Snakemake][ref:snakemake] >= 5.11<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
@@ -75,7 +84,7 @@ conda install -n base -c conda-forge mamba
 Snakemake can use the pre-built scUTRsquant Docker image to provide all additional software.
 This configuration requires installing:
 
- - [Snakemake][ref:snakemake] >= 5.11<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
@@ -87,7 +96,13 @@ This configuration requires installing:
     git clone git@github.com:Mayrlab/scUTRquant.git
     ```
 
-2. Download the UTRome annotation, kallisto index, and merge file.
+As of scUTRquant v0.4.0, that is all!
+
+<details>
+  
+> *The following steps of prepopulating the annotations and barcode whitelists are now handled directly in the pipeline.*
+  
+2. (**Deprecated**) Download the UTRome annotation, kallisto index, and merge file.
     **Human (hg38)**
     ```
     cd scUTRquant/extdata/targets/utrome_hg38_v1
@@ -103,13 +118,16 @@ This configuration requires installing:
     `utrome_kdx`, and `utrome_merge` to point to the central location. In that
     case, one does not need to redownload the files.
 
-3. (Optional) Download the barcode whitelists.
+3. (**Deprecated** and Optional) Download the barcode whitelists.
     ```
     cd scUTRquant/extdata/bxs
     sh download_10X_whitelists.sh
     ```
     **Reuse Tip:** Similar to the UTRome files, these can also be centralized
     and referenced by the `bx_whitelist` variable in the `configfile`.
+
+For GitHub runners, it takes ~ 3 mins to clone and download the scUTRquant files.
+</details>
 
 # Running Examples
 Examples are provided in the `scUTRquant/examples` folder. Each includes a script
@@ -184,6 +202,10 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
     > sce_genes <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.genes.Rds")
     ```
 
+On GitHub runners with 2-3 cores, these examples have typical execution times of 5-10 mins. 
+On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
+can process in under an hour when properly configured.
+
 # File Specifications
 ## Configuration File
 
@@ -208,6 +230,7 @@ pipeline. The following keys are expected:
  - `min_umis`: minimum number of UMIs per cell; cells below this threshold are excluded
  - `cell_annots`: (optional) CSV file with a key column that matches the `<sample_id>_<cell_bx>` format
  - `cell_annots_key`: specifies the name of the key column in the `cell_annots` file; default is `cell_id`
+ - `exclude_unannotated_cells`: boolean indicating whether unannotated cells should be excluded from the final output; default is `False`
  
 ### Default Values
 
@@ -299,7 +322,8 @@ snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config
 
 # Citation
 
-Fansler, M. M., Zhen, G., & Mayr, C. (2021). Quantification of alternative 3′UTR isoforms from single cell RNA-seq data with scUTRquant. *BioRxiv*, 2021.11.22.469635. https://doi.org/10.1101/2021.11.22.469635
+Fansler, M. M., Mitschka, S., & Mayr, C. (2023). Comprehensive annotation of 3′UTRs from primary cells and their quantification from scRNA-seq data.
+*bioRxiv*, 2021.11.22.469635. https://doi.org/10.1101/2021.11.22.469635
 
 
 <!-- References -->
