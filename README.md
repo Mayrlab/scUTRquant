@@ -189,10 +189,6 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
     cd scUTRquant
     snakemake --use-singularity --configfile examples/pbmc_1k_v3_fastq/config.yaml
     ```
-    cd scUTRquant
-    snakemake --use-singularity --configfile examples/heart_1k_v3_fastq/config.yaml
-    ```
-
 
 3. Output `SingleCellExperiment` objects can be loaded with `readRDS` in R:
 
