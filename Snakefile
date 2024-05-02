@@ -1,4 +1,4 @@
-container: "docker://mfansler/scutr-quant:0.1.5"
+container: "docker://mfansler/scutr-quant:0.4.0"
 configfile: "config.yaml"
 
 import os
