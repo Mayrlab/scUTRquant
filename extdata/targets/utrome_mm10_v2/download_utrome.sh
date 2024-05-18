@@ -7,7 +7,9 @@ wget -O tmp.tar.gz "https://figshare.com/ndownloader/files/36677958?private_link
 
 # mm10 Annotations
 ## txs
-wget -O utrome_txs_annotation.Rds "https://figshare.com/ndownloader/files/36741822?private_link=78bbfa3c5e58a8cc5275"
+wget -O utrome_mm10_v2_tx_annots.2024.05.13.csv.gz "https://figshare.com/ndownloader/files/46407730?private_link=78bbfa3c5e58a8cc5275"
+wget -O utrome_mm10_v2_tx_annots.2024.05.13.Rds "https://figshare.com/ndownloader/files/46407733?private_link=78bbfa3c5e58a8cc5275"
 
 ## genes
-wget -O utrome_genes_annotation.Rds "https://figshare.com/ndownloader/files/36741819?private_link=78bbfa3c5e58a8cc5275"
+wget -O utrome_mm10_v2_gene_annots.2024.05.13.csv.gz "https://figshare.com/ndownloader/files/46407724?private_link=78bbfa3c5e58a8cc5275"
+wget -O utrome_mm10_v2_gene_annots.2024.05.13.Rds "https://figshare.com/ndownloader/files/46407727?private_link=78bbfa3c5e58a8cc5275"
