@@ -4,6 +4,10 @@
 # scUTRquant
 A bioinformatics pipeline for single-cell 3' UTR isoform quantification.
 
+The accompanying manuscript is openly available at:
+
+> Fansler, M.M., Mitschka, S. & Mayr, C. Quantifying 3′UTR length from scRNA-seq data reveals changes independent of gene expression. *Nat Commun* **15**, 4050 (2024). [https://doi.org/10.1038/s41467-024-48254-9](https://doi.org/10.1038/s41467-024-48254-9)
+
 # Overview
 The **scUTRquant** pipeline builds on `kallisto bus` to provide a reusable tool for 
 quantifying 3' UTR isoforms from 3'-end tag-based scRNA-seq datasets. The pipeline
@@ -202,6 +206,11 @@ On GitHub runners with 2-3 cores, these examples have typical execution times of
 On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
 can process in under an hour when properly configured.
 
+## Full Examples
+The inputs used to process data in [the manuscript][ref:scUTRquant] are also available in the 
+[scUTRquant-inputs repository](https://github.com/Mayrlab/scUTRquant-inputs).
+These also include individual Snakemake pipelines to download atlas-scale datasets. 
+
 # File Specifications
 ## Configuration File
 
@@ -318,12 +327,11 @@ snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config
 
 # Citation
 
-Fansler, M. M., Mitschka, S., & Mayr, C. (2023). Comprehensive annotation of 3′UTRs from primary cells and their quantification from scRNA-seq data.
-*bioRxiv*, 2021.11.22.469635. https://doi.org/10.1101/2021.11.22.469635
+Fansler, M.M., Mitschka, S. & Mayr, C. Quantifying 3′UTR length from scRNA-seq data reveals changes independent of gene expression. *Nat Commun* **15**, 4050 (2024). [https://doi.org/10.1038/s41467-024-48254-9](https://doi.org/10.1038/s41467-024-48254-9)
 
 
 <!-- References -->
 
-[ref:scUTRquant]: https://doi.org/10.1101/2021.11.22.469635
+[ref:scUTRquant]: https://doi.org/10.1038/s41467-024-48254-9
 [ref:snakemake]: https://snakemake.readthedocs.io/en/stable/index.html
 [ref:txcutr]: https://doi.org/doi:10.18129/B9.bioc.txcutr
