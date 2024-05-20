@@ -3,12 +3,26 @@ channels:
   - conda-forge
   - bioconda
   - defaults
+  - merv
 dependencies:
+  ## downloading
+  - gzip
+  - tar
+  - wget
+
+  ## kallisto-bustools
+  - merv::kallisto=0.46.2sq
   - bustools=0.40.0
-  - r-base=4.0
-  - r-tidyverse=1.3
-  - r-cowplot=1.1
-  - bioconductor-singlecellexperiment=1.10
-  - bioconductor-plyranges=1.8
-  - xorg-libxt
-  - fonts-conda-ecosystem
+
+  ## sce + reporting
+  - r-base=4.1
+  - r-dplyr=1.0
+  - r-ggplot2=3.3
+  - r-matrix=1.4
+  - r-readr=2.1
+  - r-rmarkdown=2.14
+  - r-stringr=1.4
+  - bioconductor-hdf5array=1.22
+  - bioconductor-singlecellexperiment=1.16
+  - bioconductor-plyranges=1.14
+  - openssl=1
