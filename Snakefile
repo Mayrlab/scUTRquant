@@ -3,9 +3,16 @@ configfile: "config.yaml"
 
 import os
 import pandas as pd
-from snakemake.io import load_configfile
 from snakemake.utils import min_version
 from sys import stderr
+
+# robust loading of `load_configfile`
+try:
+    ## version >=8.0.0
+    from snakemake.common.configfile import load_configfile
+except:
+    ## version <8.0.0
+    from snakemake.io import load_configfile
 
 # set minimum Snakemake version
 min_version("6.0")

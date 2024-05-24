@@ -73,22 +73,23 @@ repository directly tests running examples on the GitHub-hosted runners.
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
 
- - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
-[Mambaforge](https://github.com/conda-forge/miniforge#mambaforge). If Conda was previously
-installed, strongly recommend installing Mamba:
+[Miniforge](https://github.com/conda-forge/miniforge#miniforge). If Conda was previously
+installed, strongly recommend that Conda be upgraded to at least v23.11 which uses the 
+faster `libmamba` solver:
 
 ```bash
-conda install -n base -c conda-forge mamba
+conda install -n base 'conda>=23.11'
 ```
  
 ### Singularity Mode (Linux)
-Snakemake can use the pre-built scUTRsquant Docker image to provide all additional software.
-This configuration requires installing:
+Snakemake can use [the pre-built scUTRquant Docker image](https://hub.docker.com/repository/docker/mfansler/scutr-quant) 
+to provide all additional software. This configuration requires installing:
 
- - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
@@ -206,7 +207,7 @@ On GitHub runners with 2-3 cores, these examples have typical execution times of
 On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
 can process in under an hour when properly configured.
 
-## Full Examples
+## Full-Scale Examples
 The inputs used to process data in [the manuscript][ref:scUTRquant] are also available in the 
 [scUTRquant-inputs repository](https://github.com/Mayrlab/scUTRquant-inputs).
 These also include individual Snakemake pipelines to download atlas-scale datasets. 
