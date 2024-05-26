@@ -1,5 +1,6 @@
 container: "docker://mfansler/scutr-quant:0.4.0"
 configfile: "config.yaml"
+SQ_VERSION="0.5.0-alpha"
 
 import os
 import pandas as pd
@@ -20,6 +21,8 @@ min_version("6.0")
 # print to stderr
 def message(*args, **kwargs):
     print(*args, file=stderr, **kwargs)
+
+message(f"[INFO] scUTRquant v{SQ_VERSION}")
 
 # make sure the tmp directory exists
 os.makedirs(config['tmp_dir'], exist_ok=True)
@@ -397,10 +400,10 @@ rule report_umis_per_cell:
         txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
         mtx="data/kallisto/{target}/{sample_id}/txs.mtx"
     params:
-        min_umis=config['min_umis']
+        min_umis=config['min_umis'],
+        sq_version=SQ_VERSION
     output:
         "qc/umi_count/{target}/{sample_id}.umi_count.html"
     conda: "envs/rmd-reporting.yaml"
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
-
