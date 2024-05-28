@@ -15,14 +15,20 @@ dependencies:
   - bustools=0.40.0
 
   ## sce + reporting
-  - r-base=4.1
-  - r-dplyr=1.0
-  - r-ggplot2=3.3
-  - r-matrix=1.4
+  - r-base=4.3
+  - r-dplyr=1.1
+  - r-ggplot2=3.5
+  - r-matrix=1.6
   - r-readr=2.1
-  - r-rmarkdown=2.14
-  - r-stringr=1.4
-  - bioconductor-hdf5array=1.22
-  - bioconductor-singlecellexperiment=1.16
-  - bioconductor-plyranges=1.14
-  - openssl=1
+  - r-rmarkdown=2.27
+  - r-stringr=1.5
+  - bioconductor-hdf5array=1.30
+  - bioconductor-singlecellexperiment=1.24
+  - bioconductor-plyranges=1.22
+  
+  ## anndata
+  - python=3.11
+  - anndata=0.10
+  - numpy=1.26
+  - pandas=2.2
+  - scipy=1.13

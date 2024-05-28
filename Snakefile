@@ -1,4 +1,4 @@
-container: "docker://mfansler/scutr-quant:0.4.0"
+container: "docker://mfansler/scutr-quant:0.5.0"
 configfile: "config.yaml"
 SQ_VERSION="0.5.0-alpha"
 
