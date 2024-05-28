@@ -57,6 +57,8 @@ if config['cell_annots'] is None:
 wildcard_constraints:
     sample_id=config['sample_regex']
 
+message(config)
+
 # get list of expected outputs
 def get_outputs():
     outputs = []
@@ -64,19 +66,25 @@ def get_outputs():
         outputs += expand("qc/umi_count/{target}/{sample_id}.umi_count.html",
                           target=target_list,
                           sample_id=samples.index.values)
-    if config['use_hdf5']:
-        outputs += expand("data/sce/{target}/{dataset}.{output_type}.{file_type}",
-                          target=target_list,
-                          dataset=config['dataset_name'],
-                          output_type=config['output_type'],
-                          file_type=['se.rds', 'assays.h5'])
-    else:
-        outputs += expand("data/sce/{target}/{dataset}.{output_type}.Rds",
-                          target=target_list,
-                          dataset=config['dataset_name'],
-                          output_type=config['output_type'])
+    if (not config['output_format']) or ("sce" in config['output_format']):
+        if config['use_hdf5']:
+            outputs += expand("data/sce/{target}/{dataset}.{output_type}.{file_type}",
+                            target=target_list,
+                            dataset=config['dataset_name'],
+                            output_type=config['output_type'],
+                            file_type=['se.rds', 'assays.h5'])
+        else:
+            outputs += expand("data/sce/{target}/{dataset}.{output_type}.Rds",
+                            target=target_list,
+                            dataset=config['dataset_name'],
+                            output_type=config['output_type'])
+    if "h5ad" in config['output_format']:
+        outputs += expand("data/h5ad/{target}/{dataset}.{output_type}.h5ad",
+                            target=target_list,
+                            dataset=config['dataset_name'],
+                            output_type=config['output_type'])
     return outputs
-    
+
 rule all:
     input: get_outputs()
 
@@ -388,6 +396,56 @@ rule mtxs_to_sce_h5_genes:
     conda: "envs/bioconductor-sce.yaml"
     script:
         "scripts/mtxs_to_sce_genes.R"
+
+rule mtxs_to_h5ad_txs:
+    input:
+        bxs=expand("data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        txs=expand("data/kallisto/{target}/{sample_id}/txs.genes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/txs.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        tx_annots=get_target_file('tx_annots_csv'),
+        cell_annots=config['cell_annots']
+    output:
+        h5ad="data/h5ad/{target}/%s.txs.h5ad" % config['dataset_name']
+    params:
+        genome=lambda wcs: targets[wcs.target]['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells']
+    resources:
+        mem_mb=16000
+    conda: "envs/anndata.yaml"
+    script:
+        "scripts/mtxs_to_h5ad_txs.py"
+
+rule mtxs_to_h5ad_genes:
+    input:
+        bxs=expand("data/kallisto/{target}/{sample_id}/genes.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        genes=expand("data/kallisto/{target}/{sample_id}/genes.genes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/genes.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        gene_annots=get_target_file('gene_annots_csv'),
+        cell_annots=config['cell_annots']
+    output:
+        h5ad="data/h5ad/{target}/%s.genes.h5ad" % config['dataset_name']
+    params:
+        genome=lambda wcs: targets[wcs.target]['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells']
+    resources:
+        mem_mb=16000
+    conda: "envs/anndata.yaml"
+    script:
+        "scripts/mtxs_to_h5ad_genes.py"
 
 
 ################################################################################

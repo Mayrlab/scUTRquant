@@ -5,7 +5,9 @@ utrome_mm10_v1:
   kdx: "adult.utrome.e3.t200.f0.999.w500.kdx"
   merge_tsv: "adult.utrome.e3.t200.f0.999.w500.merge.tsv"
   tx_annots: "utrome_txs_annotation.Rds"
+  tx_annots_csv: null
   gene_annots: "utrome_genes_annotation.Rds"
+  gene_annots_csv: null
   download_script: "download_utrome.sh"
 
 utrome_mm10_v2:
@@ -15,7 +17,9 @@ utrome_mm10_v2:
   kdx: "utrome.e30.t5.gc25.pas3.f0.9999.w500.kdx"
   merge_tsv: "utrome.e30.t5.gc25.pas3.f0.9999.w500.m200.tsv"
   tx_annots: "utrome_mm10_v2_tx_annots.2024.05.13.Rds"
+  tx_annots_csv: "utrome_mm10_v2_tx_annots.2024.05.13.csv.gz"
   gene_annots: "utrome_mm10_v2_gene_annots.2024.05.13.Rds"
+  gene_annots_csv: "utrome_mm10_v2_gene_annots.2024.05.13.csv.gz"
   download_script: "download_utrome.sh"
 
 utrome_hg38_v1:
@@ -25,7 +29,9 @@ utrome_hg38_v1:
   kdx: "utrome.e30.t5.gc39.pas3.f0.9999.w500.kdx"
   merge_tsv: "utrome.e30.t5.gc39.pas3.f0.9999.w500.m200.tsv"
   tx_annots: "utrome_hg38_v1_tx_annots.2024.05.13.Rds"
+  tx_annots_csv: "utrome_hg38_v1_tx_annots.2024.05.13.csv.gz"
   gene_annots: "utrome_hg38_v1_gene_annots.2024.05.13.Rds"
+  gene_annots_csv: "utrome_hg38_v1_gene_annots.2024.05.13.csv.gz"
   download_script: "download_utrome.sh"
 
 ## example custom target using GENCODE
