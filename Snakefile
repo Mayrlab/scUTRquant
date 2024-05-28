@@ -57,8 +57,6 @@ if config['cell_annots'] is None:
 wildcard_constraints:
     sample_id=config['sample_regex']
 
-message(config)
-
 # get list of expected outputs
 def get_outputs():
     outputs = []
@@ -446,7 +444,6 @@ rule mtxs_to_h5ad_genes:
     conda: "envs/anndata.yaml"
     script:
         "scripts/mtxs_to_h5ad_genes.py"
-
 
 ################################################################################
 ## Reports
