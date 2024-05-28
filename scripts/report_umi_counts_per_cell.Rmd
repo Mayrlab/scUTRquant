@@ -1,18 +1,23 @@
 ---
-author: "scutr-quant"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output:
-  html_document:
-    toc: true
+output: 
+  html_document: 
+    code_folding: show
+    df_print: paged
+    theme: cosmo
+    toc: TRUE
     toc_depth: 2
+    toc_float: true
 ---
 
 ```{r echo=FALSE}
 title_str <- sprintf("UMI Counts Distribution - %s", snakemake@wildcards$sample_id)
+author_str <- sprintf("scUTRquant v%s", snakemake@params$sq_version)
 ```
 
 ---
 title: `r title_str`
+author: `r author_str`
 ---
 
 # Libraries
@@ -26,22 +31,23 @@ library(magrittr)
 
 # Load Data
 ```{r load_data}
-cts <- readMM(snakemake@input$mtx) %>%
+cts_tx_bc <- readMM(snakemake@input$mtx) %>%
   as("CsparseMatrix") %>%
   `dimnames<-`(list(
     cell_bx=read_lines(snakemake@input$bxs),
     transcript_name=read_lines(snakemake@input$txs)
   )) %>%
   t %>%
-  { .[, colSums(.) > 0] } # filter zero cells
+  { .[, colSums(.) > 0] } # filter empty barcodes
 ```
 
 # Plot UMI Count Distribution
 
-Here we plot the empirical distribution of UMI counts per cell barcode and indicate the specified minimum UMI count (`r snakemake@params$min_umis`) in blue.
+Here we plot the empirical distribution of UMI counts per cell barcode and indicate 
+the specified minimum UMI count (`r snakemake@params$min_umis`) in blue.
 
 ```{r plt_umis_by_barcode}
-colSums(cts) %>%
+colSums(cts_tx_bc) %>%
   sort(decreasing=TRUE) %>%
   { tibble(x=seq_along(.), y=.) } %>%
   ggplot(aes(x,y)) +
@@ -58,12 +64,15 @@ colSums(cts) %>%
 
 # Runtime Details
 ## Session Info
+<details>
 ```{r sesh_info, echo=FALSE}
 sessionInfo()
 ```
+</details>
 
 ## Conda Environment
-```{bash comment="", echo=FALSE}
+<details>
+```{bash conda_info, comment="", echo=FALSE}
 if ! command -v conda &> /dev/null
 then
   echo "Conda not detected."
@@ -72,6 +81,8 @@ then
   echo "No active Conda environment."
 else
   echo "## Conda Environment YAML"
-  conda env export
+  PREFIX=$(dirname $(dirname $(which R)))
+  conda env export -p $PREFIX
 fi
 ```
+</details>

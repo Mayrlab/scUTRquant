@@ -44,20 +44,31 @@ determined by simulations.
 Please see [our accompanying manuscript][ref:scUTRquant] for more details.
 
 ## Outputs
+### SingleCellExperiment object (*default*)
 The primary output of the pipeline is a Bioconductor `SingleCellExperiment` object.
 The `counts` in the object is a sparse `Matrix` of 3' UTR isoform counts; the `rowRanges` 
 is a `GenomicRanges` of the 3' UTR isoforms; the `rowData` is a `DataFrame` with additional
 information about 3' UTR isoforms; and the `colData` is a `DataFrame` populated with sample 
 metadata and optional user-provide cell annotations.
 
+### H5AD AnnData object (*experimental*)
+scUTRquant v0.5.0 adds support for [AnnData objects](https://anndata.readthedocs.io/en/stable/index.html),
+making it easier for users who prefer Python and working with [the `scverse` ecosystem](https://scverse.org).
+Similar annotations will be attached in the `obs` (cell) and `var` (3'UTR isoform) tables.
+However, no analogous `rowRanges` is attached.
+
+The output format can be controlled with the `output_format` configuration option,
+with `"h5ad"` and "`sce`" being currently supported options. 
+
+### Reporting
 To assist users in quality control, the pipeline additionally generates HTML reports 
 for each sample.
 
+### Additional Files
 The pipeline is configured to retain intermediate files, such as BUS and MTX files.
 Advanced users can readily customize the pipeline to only generate the files they 
-require. For example, users who prefer to work with alternative scRNA-seq data structures,
-such as those used in Scanpy or Seurat, may wish to terminate the pipeline at MTX 
-generation.
+require. For example, users who prefer to work with alternative scRNA-seq data structures
+may wish to terminate the pipeline at MTX generation.
 
 # Setup
 
@@ -73,22 +84,23 @@ repository directly tests running examples on the GitHub-hosted runners.
 ### Conda/Mamba Mode (MacOS or Linux)
 Snakemake can use Conda to install the needed software. This configuration requires:
 
- - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
-[Mambaforge](https://github.com/conda-forge/miniforge#mambaforge). If Conda was previously
-installed, strongly recommend installing Mamba:
+[Miniforge](https://github.com/conda-forge/miniforge#miniforge). If Conda was previously
+installed, strongly recommend that Conda be upgraded to at least v23.11 which uses the 
+faster `libmamba` solver:
 
 ```bash
-conda install -n base -c conda-forge mamba
+conda install -n base 'conda>=23.11'
 ```
  
 ### Singularity Mode (Linux)
-Snakemake can use the pre-built scUTRsquant Docker image to provide all additional software.
-This configuration requires installing:
+Snakemake can use [the pre-built scUTRquant Docker image](https://hub.docker.com/repository/docker/mfansler/scutr-quant) 
+to provide all additional software. This configuration requires installing:
 
- - [Snakemake][ref:snakemake] >= 6.0, < 8.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
@@ -206,7 +218,7 @@ On GitHub runners with 2-3 cores, these examples have typical execution times of
 On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
 can process in under an hour when properly configured.
 
-## Full Examples
+## Full-Scale Examples
 The inputs used to process data in [the manuscript][ref:scUTRquant] are also available in the 
 [scUTRquant-inputs repository](https://github.com/Mayrlab/scUTRquant-inputs).
 These also include individual Snakemake pipelines to download atlas-scale datasets. 
@@ -236,6 +248,7 @@ pipeline. The following keys are expected:
  - `cell_annots`: (optional) CSV file with a key column that matches the `<sample_id>_<cell_bx>` format
  - `cell_annots_key`: specifies the name of the key column in the `cell_annots` file; default is `cell_id`
  - `exclude_unannotated_cells`: boolean indicating whether unannotated cells should be excluded from the final output; default is `False`
+ - `output_format`: a list of formats, `"sce"` (*default*) and/or `"h5ad"` (*experimental*); `null` will end processing at MTX files.
  
 ### Default Values
 
@@ -270,7 +283,9 @@ The `extdata/targets.yaml` defines the targets available to pseudoalign to. The 
  - `kdx`: Kallisto index for UTRome
  - `merge`: TSV for merging features (isoforms)
  - `tx_annots`: (optional) RDS file containing Bioconductor DataFrame object with annotations for transcripts
+ - `tx_annots_csv`: (optional) CSV file with annotations for transcripts (used for AnnData)
  - `gene_annots`: (optional) RDS file containing Bioconductor DataFrame object with annotations for genes
+ - `gene_annots_csv`: (optional) CSV file with annotations for genes (used for AnnData)
 
 
 # Customization

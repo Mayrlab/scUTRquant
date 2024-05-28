@@ -1,11 +1,19 @@
-container: "docker://mfansler/scutr-quant:0.4.0"
+container: "docker://mfansler/scutr-quant:0.5.0"
 configfile: "config.yaml"
+SQ_VERSION="0.5.0"
 
 import os
 import pandas as pd
-from snakemake.io import load_configfile
 from snakemake.utils import min_version
 from sys import stderr
+
+# robust loading of `load_configfile`
+try:
+    ## version >=8.0.0
+    from snakemake.common.configfile import load_configfile
+except:
+    ## version <8.0.0
+    from snakemake.io import load_configfile
 
 # set minimum Snakemake version
 min_version("6.0")
@@ -13,6 +21,8 @@ min_version("6.0")
 # print to stderr
 def message(*args, **kwargs):
     print(*args, file=stderr, **kwargs)
+
+message(f"[INFO] scUTRquant v{SQ_VERSION}")
 
 # make sure the tmp directory exists
 os.makedirs(config['tmp_dir'], exist_ok=True)
@@ -54,19 +64,25 @@ def get_outputs():
         outputs += expand("qc/umi_count/{target}/{sample_id}.umi_count.html",
                           target=target_list,
                           sample_id=samples.index.values)
-    if config['use_hdf5']:
-        outputs += expand("data/sce/{target}/{dataset}.{output_type}.{file_type}",
-                          target=target_list,
-                          dataset=config['dataset_name'],
-                          output_type=config['output_type'],
-                          file_type=['se.rds', 'assays.h5'])
-    else:
-        outputs += expand("data/sce/{target}/{dataset}.{output_type}.Rds",
-                          target=target_list,
-                          dataset=config['dataset_name'],
-                          output_type=config['output_type'])
+    if (not config['output_format']) or ("sce" in config['output_format']):
+        if config['use_hdf5']:
+            outputs += expand("data/sce/{target}/{dataset}.{output_type}.{file_type}",
+                            target=target_list,
+                            dataset=config['dataset_name'],
+                            output_type=config['output_type'],
+                            file_type=['se.rds', 'assays.h5'])
+        else:
+            outputs += expand("data/sce/{target}/{dataset}.{output_type}.Rds",
+                            target=target_list,
+                            dataset=config['dataset_name'],
+                            output_type=config['output_type'])
+    if "h5ad" in config['output_format']:
+        outputs += expand("data/h5ad/{target}/{dataset}.{output_type}.h5ad",
+                            target=target_list,
+                            dataset=config['dataset_name'],
+                            output_type=config['output_type'])
     return outputs
-    
+
 rule all:
     input: get_outputs()
 
@@ -82,9 +98,11 @@ for target_id, target in targets.items():
 
     target_path = target['path']
     download_script = target_path + target['download_script']
-    
-    FILE_KEYS = ['gtf', 'kdx', 'merge_tsv', 'tx_annots', 'gene_annots']
-    target_files = [target_path + target[k] for k in FILE_KEYS]
+
+    FILE_KEYS = ['gtf', 'kdx', 'merge_tsv', 
+                 'tx_annots', 'gene_annots', 
+                 'tx_annots_csv', 'gene_annots_csv']
+    target_files = [target_path + target[k] for k in FILE_KEYS if target[k] is not None]
 
     rule:
         name: f"download_{target_id}"
@@ -379,6 +397,55 @@ rule mtxs_to_sce_h5_genes:
     script:
         "scripts/mtxs_to_sce_genes.R"
 
+rule mtxs_to_h5ad_txs:
+    input:
+        bxs=expand("data/kallisto/{target}/{sample_id}/txs.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        txs=expand("data/kallisto/{target}/{sample_id}/txs.genes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/txs.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        tx_annots=get_target_file('tx_annots_csv'),
+        cell_annots=config['cell_annots']
+    output:
+        h5ad="data/h5ad/{target}/%s.txs.h5ad" % config['dataset_name']
+    params:
+        genome=lambda wcs: targets[wcs.target]['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells']
+    resources:
+        mem_mb=16000
+    conda: "envs/anndata.yaml"
+    script:
+        "scripts/mtxs_to_h5ad_txs.py"
+
+rule mtxs_to_h5ad_genes:
+    input:
+        bxs=expand("data/kallisto/{target}/{sample_id}/genes.barcodes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        genes=expand("data/kallisto/{target}/{sample_id}/genes.genes.txt",
+                   sample_id=samples.index.values, allow_missing=True),
+        mtxs=expand("data/kallisto/{target}/{sample_id}/genes.mtx",
+                    sample_id=samples.index.values, allow_missing=True),
+        gtf=get_target_file('gtf'),
+        gene_annots=get_target_file('gene_annots_csv'),
+        cell_annots=config['cell_annots']
+    output:
+        h5ad="data/h5ad/{target}/%s.genes.h5ad" % config['dataset_name']
+    params:
+        genome=lambda wcs: targets[wcs.target]['genome'],
+        sample_ids=samples.index.values,
+        min_umis=config['min_umis'],
+        cell_annots_key=config['cell_annots_key'],
+        exclude_unannotated_cells=config['exclude_unannotated_cells']
+    resources:
+        mem_mb=16000
+    conda: "envs/anndata.yaml"
+    script:
+        "scripts/mtxs_to_h5ad_genes.py"
 
 ################################################################################
 ## Reports
@@ -390,10 +457,10 @@ rule report_umis_per_cell:
         txs="data/kallisto/{target}/{sample_id}/txs.genes.txt",
         mtx="data/kallisto/{target}/{sample_id}/txs.mtx"
     params:
-        min_umis=config['min_umis']
+        min_umis=config['min_umis'],
+        sq_version=SQ_VERSION
     output:
         "qc/umi_count/{target}/{sample_id}.umi_count.html"
     conda: "envs/rmd-reporting.yaml"
     script:
         "scripts/report_umi_counts_per_cell.Rmd"
-
