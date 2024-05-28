@@ -7,6 +7,8 @@ target: "utrome_mm10_v2"
 output_type:
   - "txs"
   - "genes"
+output_format:
+  - "sce"
 tmp_dir: "/tmp"
 bx_whitelist: null
 correct_bus: True
