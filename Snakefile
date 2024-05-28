@@ -98,8 +98,10 @@ for target_id, target in targets.items():
 
     target_path = target['path']
     download_script = target_path + target['download_script']
-    
-    FILE_KEYS = ['gtf', 'kdx', 'merge_tsv', 'tx_annots', 'gene_annots']
+
+    FILE_KEYS = ['gtf', 'kdx', 'merge_tsv', 
+                 'tx_annots', 'gene_annots',
+                 'tx_annots_csv', 'gene_annots_csv']
     target_files = [target_path + target[k] for k in FILE_KEYS]
 
     rule:
