@@ -1,5 +1,5 @@
 utrome_mm10_v1:
-  path: "extdata/targets/utrome_mm10_v1/"  # files should be relative to this
+  path: "extdata/targets/utrome_mm10_v1/"
   genome: "mm10"
   gtf: "adult.utrome.e3.t200.f0.999.w500.gtf"
   kdx: "adult.utrome.e3.t200.f0.999.w500.kdx"
@@ -37,10 +37,12 @@ utrome_hg38_v1:
 ## example custom target using GENCODE
 ## see https://github.com/Mayrlab/txcutr-db
 # gencode_v38_pc_w500:
-#   path: "extdata/targets/gencode_v38_pc_w500/"
+#   path: "extdata/targets/gencode_v38_pc_w500/"  # files must be relative to this
 #   genome: "hg38"
 #   gtf: "gencode.v38.annotation.pc.txcutr.w500.gtf"
 #   kdx: "gencode.v38.annotation.pc.txcutr.w500.kdx"
 #   merge_tsv: "gencode.v38.annotation.pc.txcutr.w500.merge.tsv"
 #   tx_annots: null
+#   tx_annots_csv: null
 #   gene_annots: null
+#   gene_annots_csv: null

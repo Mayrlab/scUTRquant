@@ -100,9 +100,9 @@ for target_id, target in targets.items():
     download_script = target_path + target['download_script']
 
     FILE_KEYS = ['gtf', 'kdx', 'merge_tsv', 
-                 'tx_annots', 'gene_annots',
+                 'tx_annots', 'gene_annots', 
                  'tx_annots_csv', 'gene_annots_csv']
-    target_files = [target_path + target[k] for k in FILE_KEYS]
+    target_files = [target_path + target[k] for k in FILE_KEYS if target[k] is not None]
 
     rule:
         name: f"download_{target_id}"
