@@ -83,7 +83,7 @@ def process_mtx_files(snakemake):
         combined_adata.obs = combined_adata.obs.join(cell_annots_df.set_index(cell_annots_key, drop=False), how='left')
     
     message(f"[INFO] Saving AnnData to {output_file}...")
-    combined_adata.write(output_file)
+    combined_adata.write(output_file, compression="gzip")
 
 # Check for snakemake object and process
 try:
