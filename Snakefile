@@ -1,6 +1,6 @@
 container: "docker://mfansler/scutr-quant:0.5.0"
 configfile: "config.yaml"
-SQ_VERSION="0.5.0-alpha"
+SQ_VERSION="0.5.0"
 
 import os
 import pandas as pd
