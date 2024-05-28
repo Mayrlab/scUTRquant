@@ -44,20 +44,31 @@ determined by simulations.
 Please see [our accompanying manuscript][ref:scUTRquant] for more details.
 
 ## Outputs
+### SingleCellExperiment object (*default*)
 The primary output of the pipeline is a Bioconductor `SingleCellExperiment` object.
 The `counts` in the object is a sparse `Matrix` of 3' UTR isoform counts; the `rowRanges` 
 is a `GenomicRanges` of the 3' UTR isoforms; the `rowData` is a `DataFrame` with additional
 information about 3' UTR isoforms; and the `colData` is a `DataFrame` populated with sample 
 metadata and optional user-provide cell annotations.
 
+### H5AD AnnData object (*experimental*)
+scUTRquant v0.5.0 adds support for [AnnData objects](https://anndata.readthedocs.io/en/stable/index.html),
+making it easier for users who prefer Python and working with [the `scverse` ecosystem](https://scverse.org).
+Similar annotations will be attached in the `obs` (cell) and `var` (3'UTR isoform) tables.
+However, no analogous `rowRanges` is attached.
+
+The output format can be controlled with the `output_format` configuration option,
+with `"h5ad"` and "`sce`" being currently supported options. 
+
+### Reporting
 To assist users in quality control, the pipeline additionally generates HTML reports 
 for each sample.
 
+### Additional Files
 The pipeline is configured to retain intermediate files, such as BUS and MTX files.
 Advanced users can readily customize the pipeline to only generate the files they 
-require. For example, users who prefer to work with alternative scRNA-seq data structures,
-such as those used in Scanpy or Seurat, may wish to terminate the pipeline at MTX 
-generation.
+require. For example, users who prefer to work with alternative scRNA-seq data structures
+may wish to terminate the pipeline at MTX generation.
 
 # Setup
 
@@ -237,6 +248,7 @@ pipeline. The following keys are expected:
  - `cell_annots`: (optional) CSV file with a key column that matches the `<sample_id>_<cell_bx>` format
  - `cell_annots_key`: specifies the name of the key column in the `cell_annots` file; default is `cell_id`
  - `exclude_unannotated_cells`: boolean indicating whether unannotated cells should be excluded from the final output; default is `False`
+ - `output_format`: a list of formats, `"sce"` (*default*) and/or `"h5ad"` (*experimental*); `null` will end processing at MTX files.
  
 ### Default Values
 
@@ -271,7 +283,9 @@ The `extdata/targets.yaml` defines the targets available to pseudoalign to. The 
  - `kdx`: Kallisto index for UTRome
  - `merge`: TSV for merging features (isoforms)
  - `tx_annots`: (optional) RDS file containing Bioconductor DataFrame object with annotations for transcripts
+ - `tx_annots_csv`: (optional) CSV file with annotations for transcripts (used for AnnData)
  - `gene_annots`: (optional) RDS file containing Bioconductor DataFrame object with annotations for genes
+ - `gene_annots_csv`: (optional) CSV file with annotations for genes (used for AnnData)
 
 
 # Customization
