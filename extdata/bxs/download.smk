@@ -12,7 +12,8 @@ rule download_10X_whitelists:
     output:
         "extdata/bxs/737K-april-2014_rc.txt",
         "extdata/bxs/737K-august-2016.txt",
-        "extdata/bxs/3M-february-2018.txt"
+        "extdata/bxs/3M-february-2018.txt",
+        "extdata/bxs/gex_737K-arc-v1.txt"
     conda: "../../envs/downloading.yaml"
     shell:
         """
