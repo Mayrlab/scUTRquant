@@ -1,0 +1,2 @@
+sample_id,file_type,files
+pbmc_unsorted_3k_multiome_bam,bam,examples/pbmc_unsorted_3k_multiome_bam/pbmc_unsorted_3k_gex.bam
