@@ -101,7 +101,7 @@ conda install -n base 'conda>=23.11'
 Snakemake can use [the pre-built scUTRquant Docker image](https://hub.docker.com/repository/docker/mfansler/scutr-quant) 
 to provide all additional software. This configuration requires installing:
 
- - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
+ - [Snakemake][ref:snakemake] >= 6.0<sup>a</sup>
  - Pandas >=2,<3<sup>b</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
