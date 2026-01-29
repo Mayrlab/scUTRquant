@@ -85,26 +85,30 @@ repository directly tests running examples on the GitHub-hosted runners.
 Snakemake can use Conda to install the needed software. This configuration requires:
 
  - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
+ - [Pandas] >=2,<3<sup>b</sup>
  - [Conda](https://docs.conda.io/projects/conda/en/latest/)
 
 If Conda is not already installed, we strongly recommend installing 
 [Miniforge](https://github.com/conda-forge/miniforge#miniforge). If Conda was previously
-installed, strongly recommend that Conda be upgraded to at least v23.11 which uses the 
+installed, we strongly recommend that Conda be upgraded to at least v23.11 which uses the 
 faster `libmamba` solver:
 
 ```bash
 conda install -n base 'conda>=23.11'
 ```
- 
+
 ### Singularity Mode (Linux)
 Snakemake can use [the pre-built scUTRquant Docker image](https://hub.docker.com/repository/docker/mfansler/scutr-quant) 
 to provide all additional software. This configuration requires installing:
 
  - [Snakemake][ref:snakemake] >= 6.0<sup>ª</sup>
+ - [Pandas] >=2,<3<sup>b</sup>
  - [Singularity](https://singularity.lbl.gov/index.html)
 
 
 <sub>**[a]**: Snakemake v7.8.0-7.8.3 enforced a Conda configuration setting of `channel_priority: strict` by raising an exception. However, `scUTRquant` uses environments that require `channel_priority: flexible` to properly solve. Snakemake v7.8.4+ will warn against this, but can safely be ignored.</sub>
+
+<sub>**[b]**: Due to a possibility that Pandas coinstalled with Snakemake can leak into all Python environments, we recommend using only v2 until environment scripts can be updated for compatibility. See https://github.com/Mayrlab/scUTRquant/issues/102.</sub>
 
 ## Installation
 1. Clone the repository.
@@ -172,7 +176,7 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
 
    **Singularity Mode**
     ```bash
-    cd scutr-quant
+    cd scUTRquant
     snakemake --use-singularity --configfile examples/neuron_1k_v3_bam/config.yaml
     ```
     
@@ -206,22 +210,51 @@ Note that the `config.yaml` uses paths relative to the `scUTRquant` folder.
     snakemake --use-singularity --configfile examples/pbmc_1k_v3_fastq/config.yaml
     ```
 
+## 3K PBMCs (Multiome - GEX) - BAM
+
+Version v0.5.1 adds *experimental support* for processing the gene expression 
+modality of 10X single-nucleus Multiome data. This example downloads the BAM for only 
+that modality. Users processing their own multiome data, should please be sure to use 
+the Multiome-specific barcode whitelist (`extdata/bxs/gex_737K-arc-v1.txt`).
+
+1. Download the raw data.
+    ```bash
+    cd scUTRquant/examples/pbmc_unsorted_3k_multiome_bam/
+    sh download.sh
+    ```
+
+2. Run the pipeline.
+
+   **Conda Mode**
+    ```bash
+    cd scUTRquant
+    snakemake --use-conda --configfile examples/pbmc_unsorted_3k_multiome_bam/config.yaml
+    ```
+
+   **Singularity Mode**
+    ```bash
+    cd scUTRquant
+    snakemake --use-singularity --configfile examples/pbmc_unsorted_3k_multiome_bam/config.yaml
+    ```
+
 3. Output `SingleCellExperiment` objects can be loaded with `readRDS` in R:
 
    **R Session**
     ```r
-    > sce_txs <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.txs.Rds")
-    > sce_genes <- readRDS("data/sce/utrome_hg38_v1/pbmc_1k_v3_fastq.genes.Rds")
+    > sce_txs <- readRDS("data/sce/utrome_hg38_v1/pbmc_unsorted_3k_multiome_bam.txs.Rds")
+    > sce_genes <- readRDS("data/sce/utrome_hg38_v1/pbmc_unsorted_3k_multiome_bam.genes.Rds")
     ```
-
-On GitHub runners with 2-3 cores, these examples have typical execution times of 5-10 mins. 
-On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
-can process in under an hour when properly configured.
 
 ## Full-Scale Examples
 The inputs used to process data in [the manuscript][ref:scUTRquant] are also available in the 
 [scUTRquant-inputs repository](https://github.com/Mayrlab/scUTRquant-inputs).
 These also include individual Snakemake pipelines to download atlas-scale datasets. 
+
+## Performance
+On GitHub runners with 2-3 cores, the demo examples have typical execution times of 5-10 mins 
+(see [scUTRquant-demo](https://github.com/mfansler/scUTRquant-demo)). 
+On HPC systems with multiple nodes with multiple cores, a large job (e.g., 1-2TB raw data) 
+can be processed in under an hour when properly configured.
 
 # File Specifications
 ## Configuration File
@@ -243,7 +276,7 @@ pipeline. The following keys are expected:
      with respect to transcripts; all 10X 3'-end libraries use `--fr-stranded`;
      omitting this argument eliminates the ability to correctly assign reads to
      transcripts when opposing stranded genes overlap
- - `bx_whitelist`: file of valid barcodes used in `bustools correct`
+ - `bx_whitelist`: file of valid barcodes used in `bustools correct`; the `extdata/bxs/download.smk` file enumerates available files
  - `min_umis`: minimum number of UMIs per cell; cells below this threshold are excluded
  - `cell_annots`: (optional) CSV file with a key column that matches the `<sample_id>_<cell_bx>` format
  - `cell_annots_key`: specifies the name of the key column in the `cell_annots` file; default is `cell_id`
@@ -338,7 +371,6 @@ The rules in the `Snakefile` include `threads` and `resources` arguments per rul
 ```bash
 snakemake --profile profile_name --configfile examples/neuron_1k_v3_fastq/config.yaml
 ```
-
 
 # Citation
 
